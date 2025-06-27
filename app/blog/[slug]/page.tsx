@@ -98,6 +98,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Filtrar posts relacionados (excluindo o atual)
   const relatedPosts = recentPosts.filter((p) => p.id !== post.id).slice(0, 4)
 
+  // Calcular tempo de leitura
+  const wordCount = [
+    post.resumo,
+    post.secao_1_texto,
+    post.secao_2_texto,
+    post.secao_3_texto,
+    post.secao_4_texto,
+    post.secao_5_texto,
+    post.secao_6_texto,
+    post.secao_7_texto,
+    post.conclusao,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .split(" ").length
+
+  const readingTime = Math.ceil(wordCount / 200)
+
   return (
     <>
       <Head>
@@ -124,6 +142,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               "@type": "Organization",
               name: "Café Canastra",
               url: "https://cafecanastra.com",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://cafecanastra.com/logo-canastra.png",
+              },
             },
             publisher: {
               "@type": "Organization",
@@ -134,11 +156,39 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               },
             },
             datePublished: post.created_at,
-            dateModified: post.updated_at,
+            dateModified: post.updated_at || post.created_at,
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id": post.og_url || `https://cafecanastra.com/blog/${slug}`,
             },
+            wordCount: wordCount,
+            timeRequired: `PT${readingTime}M`,
+            articleSection: "Blog",
+            keywords: post.meta_keywords || "café especial, serra da canastra, café brasileiro",
+            inLanguage: "pt-BR",
+            isAccessibleForFree: true,
+            license: "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+            about: [
+              {
+                "@type": "Thing",
+                name: "Café Especial",
+              },
+              {
+                "@type": "Thing",
+                name: "Serra da Canastra",
+              },
+              {
+                "@type": "Thing",
+                name: "Café Brasileiro",
+              },
+            ],
+            mentions: [
+              {
+                "@type": "Organization",
+                name: "Café Canastra",
+                url: "https://cafecanastra.com",
+              },
+            ],
           }),
         }}
       />

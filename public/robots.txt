@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://cafecanastra.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Disallow admin areas
+Disallow: /blogmanager/
+Disallow: /api/
+
+# Allow important pages
+Allow: /blog/
+Allow: /cafecanastra/ 
