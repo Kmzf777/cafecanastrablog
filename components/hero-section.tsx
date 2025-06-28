@@ -1,74 +1,73 @@
 "use client"
 
-import { useRef } from "react"
-import { useFrame } from "@react-three/fiber"
-import { Text, Float, Sparkles } from "@react-three/drei"
-import type * as THREE from "three"
-
-function MountainRange() {
-  const mountainRef = useRef<THREE.Group>(null)
-
-  useFrame((state) => {
-    if (mountainRef.current) {
-      mountainRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * 0.1
-      mountainRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.1
-    }
-  })
-
-  return (
-    <group ref={mountainRef} position={[0, -2, -5]}>
-      {/* Mountain silhouettes */}
-      <mesh position={[-3, 0, 0]}>
-        <coneGeometry args={[2, 4, 8]} />
-        <meshStandardMaterial color="#2d1810" />
-      </mesh>
-      <mesh position={[0, 0.5, -1]}>
-        <coneGeometry args={[2.5, 5, 8]} />
-        <meshStandardMaterial color="#1a0f08" />
-      </mesh>
-      <mesh position={[3, -0.5, 0]}>
-        <coneGeometry args={[1.8, 3.5, 8]} />
-        <meshStandardMaterial color="#2d1810" />
-      </mesh>
-    </group>
-  )
-}
-
-function CoffeeParticles() {
-  return <Sparkles count={100} scale={[10, 10, 10]} size={2} speed={0.3} color="#d97706" />
-}
+import { motion } from "framer-motion"
 
 export default function HeroSection() {
   return (
-    <group>
-      <MountainRange />
-      <CoffeeParticles />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 to-orange-100">
+      {/* Background mountains */}
+      <div className="absolute inset-0 flex items-end justify-center">
+        <motion.div 
+          className="flex space-x-8"
+          animate={{ 
+            y: [0, -10, 0],
+            rotateY: [0, 5, 0]
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <div className="w-32 h-32 bg-gradient-to-t from-amber-800 to-amber-600 transform rotate-45 rounded-t-full"></div>
+          <div className="w-40 h-40 bg-gradient-to-t from-amber-900 to-amber-700 transform rotate-45 rounded-t-full"></div>
+          <div className="w-28 h-28 bg-gradient-to-t from-amber-800 to-amber-600 transform rotate-45 rounded-t-full"></div>
+        </motion.div>
+      </div>
 
-      <Float speed={1} rotationIntensity={0.5} floatIntensity={0.5}>
-        <Text
-          font="/fonts/Geist-Bold.ttf"
-          fontSize={1.2}
-          position={[0, 1, 0]}
-          color="#f59e0b"
-          anchorX="center"
-          anchorY="middle"
+      {/* Coffee particles */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-amber-400 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 text-center px-4">
+        <motion.h1
+          className="text-5xl md:text-7xl font-bold text-amber-800 mb-4"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
         >
           O Café da Serra do Tempo
-        </Text>
-      </Float>
-
-      <Float speed={0.8} rotationIntensity={0.3} floatIntensity={0.3}>
-        <Text
-          font="/fonts/Geist-Regular.ttf"
-          fontSize={0.4}
-          position={[0, 0.2, 0]}
-          color="#fbbf24"
-          anchorX="center"
-          anchorY="middle"
+        </motion.h1>
+        
+        <motion.p
+          className="text-xl md:text-2xl text-amber-600 font-medium"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
         >
           Feito com calma. Bebido com alma.
-        </Text>
-      </Float>
-    </group>
+        </motion.p>
+      </div>
+    </div>
   )
 }

@@ -7,9 +7,20 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'cafe-canastra-super-secret-key-2024'
 )
 
-// Rotas protegidas
+// Rotas protegidas (requerem autenticação)
 const PROTECTED_ROUTES = ['/blogmanager', '/api/blog-webhook']
-const PUBLIC_ROUTES = ['/login', '/api/login']
+
+// Rotas públicas (não requerem autenticação)
+const PUBLIC_ROUTES = [
+  '/login', 
+  '/api/login',
+  '/cafecanastra',
+  '/blog',
+  '/',
+  '/sitemap.xml',
+  '/robots.txt',
+  '/manifest.json'
+]
 
 // Rate limiting simples
 const rateLimitMap = new Map()
@@ -114,7 +125,9 @@ export async function middleware(request: NextRequest) {
   
   // Verificar se é uma rota protegida
   const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route))
-  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route))
+  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || 
+                       pathname.startsWith('/blog/') || 
+                       pathname.startsWith('/api/auth/')
   
   if (isProtectedRoute) {
     // Verificar token JWT

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useAccessibility } from "@/app/accessibility"
 
 interface SkipLinkProps {
   targetId?: string
@@ -10,7 +9,6 @@ interface SkipLinkProps {
 
 export default function SkipLink({ targetId = "main-content", children = "Pular para o conteúdo principal" }: SkipLinkProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const { focus } = useAccessibility()
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -45,7 +43,8 @@ export default function SkipLink({ targetId = "main-content", children = "Pular 
     event.preventDefault()
     const targetElement = document.getElementById(targetId)
     if (targetElement) {
-      focus(targetElement)
+      targetElement.focus()
+      targetElement.scrollIntoView({ behavior: "smooth" })
     }
   }
 
