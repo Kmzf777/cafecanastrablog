@@ -11,6 +11,8 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 
 export default function LoginPage() {
+  console.log("LoginPage renderizando...")
+  
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -23,6 +25,7 @@ export default function LoginPage() {
 
   // Verificar se já está logado
   useEffect(() => {
+    console.log("LoginPage useEffect executando...")
     checkAuthStatus()
   }, [])
 
@@ -50,14 +53,18 @@ export default function LoginPage() {
 
   const checkAuthStatus = async () => {
     try {
+      console.log("Verificando status de autenticação...")
       const response = await fetch('/api/auth/verify', {
         method: 'GET',
         credentials: 'include',
       })
       
       if (response.ok) {
+        console.log("Usuário já autenticado, redirecionando...")
         // Já está logado, redirecionar para o blog manager
         window.location.href = '/blogmanager'
+      } else {
+        console.log("Usuário não autenticado")
       }
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error)
@@ -66,6 +73,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("Tentativa de login...")
 
     if (isBlocked) {
       toast({
@@ -97,6 +105,7 @@ export default function LoginPage() {
       })
 
       const data = await response.json()
+      console.log("Resposta do login:", data)
 
       if (data.success) {
         toast({
@@ -139,6 +148,8 @@ export default function LoginPage() {
     const remainingSeconds = seconds % 60
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
+
+  console.log("Renderizando componente de login...")
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-yellow-50 flex items-center justify-center p-4">
@@ -199,78 +210,55 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     disabled={isLoading || isBlocked}
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {isBlocked && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <div className="flex items-center text-red-700">
-                    <Shield className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">
-                      Acesso temporariamente bloqueado
-                    </span>
-                  </div>
-                  <p className="text-red-600 text-sm mt-1">
-                    Tente novamente em {formatTime(blockTime)}
+                <div className="text-center p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">
+                    Acesso bloqueado por {formatTime(blockTime)}
                   </p>
-                </div>
-              )}
-
-              {loginAttempts > 0 && !isBlocked && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <div className="flex items-center text-yellow-700">
-                    <Shield className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">
-                      Tentativas restantes: {5 - loginAttempts}
-                    </span>
-                  </div>
                 </div>
               )}
 
               <Button
                 type="submit"
                 disabled={isLoading || isBlocked}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Entrando...
                   </>
                 ) : (
                   <>
-                    <Shield className="w-4 h-4 mr-2" />
+                    <Shield className="mr-2 h-4 w-4" />
                     Entrar
                   </>
                 )}
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="text-center">
-                <Link
-                  href="/cafecanastra"
-                  className="text-sm text-amber-600 hover:text-amber-700 font-medium"
-                >
-                  ← Voltar ao site principal
-                </Link>
-              </div>
+            <div className="mt-6 text-center">
+              <Link
+                href="/cafecanastra"
+                className="text-sm text-amber-600 hover:text-amber-700 transition-colors"
+              >
+                ← Voltar para o site
+              </Link>
             </div>
           </CardContent>
         </Card>
-
-        {/* Informações de segurança */}
-        <div className="mt-6 text-center">
-          <div className="flex items-center justify-center text-gray-500 text-xs">
-            <Shield className="w-3 h-3 mr-1" />
-            <span>Acesso restrito - Apenas administradores autorizados</span>
-          </div>
-        </div>
       </motion.div>
     </div>
   )

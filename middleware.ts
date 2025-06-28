@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { jwtVerify, SignJWT } from 'jose'
+import { jwtVerify } from 'jose'
 
 // Chave secreta para JWT (em produção, use uma chave mais segura)
 const JWT_SECRET = new TextEncoder().encode(
@@ -8,12 +8,14 @@ const JWT_SECRET = new TextEncoder().encode(
 )
 
 // Rotas protegidas (requerem autenticação)
-const PROTECTED_ROUTES = ['/blogmanager', '/api/blog-webhook']
+const PROTECTED_ROUTES = ['/blogmanager']
 
 // Rotas públicas (não requerem autenticação)
 const PUBLIC_ROUTES = [
   '/login', 
   '/api/login',
+  '/api/auth/verify',
+  '/api/auth/logout',
   '/cafecanastra',
   '/blog',
   '/',
@@ -70,6 +72,8 @@ async function verifyToken(token: string): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+  
+  console.log(`[MIDDLEWARE] Acessando: ${pathname}`)
   
   // Headers de segurança
   const response = NextResponse.next()
@@ -130,11 +134,13 @@ export async function middleware(request: NextRequest) {
                        pathname.startsWith('/api/auth/')
   
   if (isProtectedRoute) {
+    console.log(`[MIDDLEWARE] Rota protegida: ${pathname}`)
+    
     // Verificar token JWT
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('Bearer ', '') || request.cookies.get('admin-token')?.value
+    const token = request.cookies.get('admin-token')?.value
     
     if (!token) {
+      console.log(`[MIDDLEWARE] Token não encontrado, redirecionando para login`)
       // Redirecionar para login se não houver token
       const loginUrl = new URL('/login', request.url)
       return NextResponse.redirect(loginUrl)
@@ -143,12 +149,15 @@ export async function middleware(request: NextRequest) {
     // Verificar se o token é válido
     const isValidToken = await verifyToken(token)
     if (!isValidToken) {
+      console.log(`[MIDDLEWARE] Token inválido, redirecionando para login`)
       // Token inválido, redirecionar para login
       const loginUrl = new URL('/login', request.url)
       const response = NextResponse.redirect(loginUrl)
       response.cookies.delete('admin-token')
       return response
     }
+    
+    console.log(`[MIDDLEWARE] Token válido, permitindo acesso`)
   }
   
   // Bloquear acesso direto a arquivos sensíveis

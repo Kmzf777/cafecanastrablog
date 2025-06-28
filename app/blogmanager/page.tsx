@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -39,7 +39,7 @@ import {
   LogOut,
   User,
   EyeOff,
-  Shield,
+  Shield
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -51,6 +51,20 @@ import {
   debugEnvironmentVariables,
 } from "@/lib/supabase"
 import SupabaseStatus from "@/components/supabase-status"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useAutoConfig } from "@/hooks/use-auto-config"
 
 export default function BlogManagerPage() {
   console.log("[DEBUG] BlogManagerPage renderizou");
@@ -62,9 +76,16 @@ export default function BlogManagerPage() {
   // Estado para verificação do Supabase
   const [supabaseStatus, setSupabaseStatus] = useState<"checking" | "connected" | "error">("checking")
 
-  // Estado para a aba de Postagem Automática
-  const [quantidadePosts, setQuantidadePosts] = useState(1)
-  const [atrasoPosts, setAtrasoPosts] = useState(1000)
+  // Usar o hook de configuração automática com persistência
+  const { config: autoConfig, isLoading: isConfigLoading, isSaving: isConfigSaving, updateConfig } = useAutoConfig()
+  
+  const [scheduledStatus, setScheduledStatus] = useState<{
+    isWithinAllowedTime: boolean
+    currentTime: string
+    allowedTime: string
+    status: string
+  } | null>(null)
+  const [isCheckingSchedule, setIsCheckingSchedule] = useState(false)
 
   // Estado para a aba de Postagem Personalizada
   const [tema, setTema] = useState("")
@@ -80,10 +101,70 @@ export default function BlogManagerPage() {
 
   const { toast } = useToast()
 
+  // Defina a função ANTES dos useEffect
+  const checkScheduledStatus = useCallback(async () => {
+    setIsCheckingSchedule(true)
+    try {
+      const response = await fetch('/api/scheduled-posts', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setScheduledStatus({
+          isWithinAllowedTime: data.isWithinAllowedTime,
+          currentTime: data.currentTime,
+          allowedTime: data.allowedTime,
+          status: data.status
+        })
+      } else {
+        throw new Error('Falha ao verificar status do agendamento')
+      }
+    } catch (error) {
+      console.error('Erro ao verificar status do agendamento:', error)
+      toast({
+        title: "Erro",
+        description: "Falha ao verificar status do agendamento automático.",
+        variant: "destructive",
+        duration: 5000,
+      })
+    } finally {
+      setIsCheckingSchedule(false)
+    }
+  }, [toast])
+
+  // Agora os useEffect podem usar checkScheduledStatus normalmente
+  useEffect(() => {
+    if (activeTab === "gerenciamento" && isAuthorized && !isCheckingSchedule) {
+      checkScheduledStatus()
+    }
+  }, [activeTab, isAuthorized, checkScheduledStatus, isCheckingSchedule])
+
+  useEffect(() => {
+    if (isAuthorized && !isCheckingSchedule && !scheduledStatus) {
+      checkScheduledStatus()
+    }
+  }, [isAuthorized, checkScheduledStatus, isCheckingSchedule, scheduledStatus])
+
   useEffect(() => {
     // Verificar autenticação via API
     checkAuthStatus()
   }, [])
+
+  // Verificar status do Supabase na inicialização
+  useEffect(() => {
+    if (isAuthorized) {
+      checkSupabaseStatus()
+    }
+  }, [isAuthorized])
+
+  // Carregar posts do Supabase quando a aba de gerenciamento for ativada
+  useEffect(() => {
+    if (isAuthorized && activeTab === "gerenciamento") {
+      loadPostsFromSupabase()
+    }
+  }, [isAuthorized, activeTab])
 
   const checkAuthStatus = async () => {
     try {
@@ -114,28 +195,6 @@ export default function BlogManagerPage() {
       checkSupabaseStatus()
     }
   }, [isAuthorized])
-
-  // Carregar posts do Supabase quando a aba de gerenciamento for ativada
-  useEffect(() => {
-    if (isAuthorized && activeTab === "gerenciamento") {
-      loadPostsFromSupabase()
-    }
-  }, [isAuthorized, activeTab])
-
-  const handleLogout = async () => {
-    try {
-      // Chamar API de logout
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
-    } catch (error) {
-      console.error('Erro no logout:', error)
-    } finally {
-      // Redirecionar para login
-      window.location.href = '/login'
-    }
-  }
 
   const checkSupabaseStatus = async () => {
     try {
@@ -206,11 +265,25 @@ export default function BlogManagerPage() {
       return
     }
 
+    if (!autoConfig.isEnabled) {
+      toast({
+        title: "Aviso",
+        description: "O agendamento automático está desabilitado. Habilite-o primeiro.",
+        variant: "destructive",
+        duration: 5000,
+      })
+      return
+    }
+
     setIsLoading(true)
     const payload = {
-      modo: "automático",
-      quantidade: quantidadePosts,
-      atraso: atrasoPosts,
+      modo: autoConfig.modo,
+      quantidade: 1,
+      atraso: 1000,
+      tema: autoConfig.tema,
+      publico_alvo: autoConfig.publico_alvo,
+      startHour: autoConfig.startHour,
+      endHour: autoConfig.endHour
     }
 
     console.log("=== ENVIANDO WEBHOOK AUTOMÁTICO ===")
@@ -231,7 +304,7 @@ export default function BlogManagerPage() {
       if (createdPosts > 0) {
         toast({
           title: "✅ Posts criados!",
-          description: `${createdPosts} post(s) criados e salvos no Supabase.`,
+          description: `${createdPosts} post(s) criado(s) e salvos no Supabase.`,
           duration: 5000,
         })
         setActiveTab("gerenciamento")
@@ -358,27 +431,25 @@ export default function BlogManagerPage() {
   }
 
   const handleDeletePost = async (postId: string) => {
+    if (!confirm("Tem certeza que deseja excluir este post?")) return
+
     try {
-      const success = await deleteBlogPost(postId)
+      const { error } = await supabase.from("blog_posts").delete().eq("id", postId)
+      if (error) throw error
 
-      if (success) {
-        const updatedPosts = posts.filter((post) => post.id !== postId)
-        setPosts(updatedPosts)
+      toast({
+        title: "✅ Post excluído!",
+        description: "Post removido do Supabase com sucesso.",
+        duration: 3000,
+      })
 
-        toast({
-          title: "Post excluído",
-          description: "O post foi removido do Supabase com sucesso.",
-          duration: 3000,
-        })
-      } else {
-        throw new Error("Falha ao deletar post")
-      }
-    } catch (error) {
+      loadPostsFromSupabase()
+    } catch (error: any) {
       toast({
         title: "Erro",
-        description: "Erro ao excluir post do Supabase.",
+        description: error.message || "Falha ao excluir post.",
         variant: "destructive",
-        duration: 3000,
+        duration: 5000,
       })
     }
   }
@@ -398,6 +469,88 @@ export default function BlogManagerPage() {
       })
     } catch {
       return "Data inválida"
+    }
+  }
+
+  const executeScheduledPosts = async () => {
+    if (supabaseStatus !== "connected") {
+      toast({
+        title: "Erro",
+        description: "Supabase não está conectado. Não é possível criar posts.",
+        variant: "destructive",
+        duration: 5000,
+      })
+      return
+    }
+
+    if (!autoConfig.isEnabled) {
+      toast({
+        title: "Aviso",
+        description: "O agendamento automático está desabilitado. Habilite-o primeiro.",
+        variant: "destructive",
+        duration: 5000,
+      })
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      const payload = {
+        modo: autoConfig.modo,
+        quantidade: 1,
+        atraso: 1000,
+        tema: autoConfig.tema,
+        publico_alvo: autoConfig.publico_alvo,
+        startHour: autoConfig.startHour,
+        endHour: autoConfig.endHour
+      }
+
+      const response = await fetch('/api/scheduled-posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "✅ Agendamento executado!",
+          description: `${data.createdPosts} post(s) criado(s) com sucesso.`,
+          duration: 5000,
+        })
+        
+        // Atualizar status e carregar posts
+        await checkScheduledStatus()
+        setTimeout(() => loadPostsFromSupabase(), 1000)
+      } else {
+        throw new Error(data.error || 'Falha na execução do agendamento')
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Falha ao executar agendamento automático.",
+        variant: "destructive",
+        duration: 5000,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      // Chamar API de logout
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+    } catch (error) {
+      console.error('Erro no logout:', error)
+    } finally {
+      // Redirecionar para login
+      window.location.href = '/login'
     }
   }
 
@@ -652,83 +805,222 @@ export default function BlogManagerPage() {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Aba 1: Postagem Automática */}
+              {/* Aba 1: Postagem Automática e Agendamento */}
               <TabsContent value="automatico">
-                <Card className="border-gray-200 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-gray-800">Postagem Automática</CardTitle>
-                    <CardDescription className="text-gray-600">
-                      Configure os parâmetros para postagens automáticas no blog
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="quantidade" className="text-gray-700">
-                          Quantidade de posts
-                        </Label>
-                        <span className="text-sm font-medium text-amber-600">{quantidadePosts}</span>
-                      </div>
-                      <Slider
-                        id="quantidade"
-                        min={1}
-                        max={10}
-                        step={1}
-                        value={[quantidadePosts]}
-                        onValueChange={(value) => setQuantidadePosts(value[0])}
-                        className="w-full"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <Label htmlFor="atraso" className="mr-2 text-gray-700">
-                            Atraso entre posts (ms)
-                          </Label>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-amber-500" />
-                              </TooltipTrigger>
-                              <TooltipContent className="bg-white border-gray-200 text-gray-800">
-                                <p className="w-[200px] text-sm">
-                                  Tempo de espera em milissegundos entre a publicação de cada post automático.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                <div className="space-y-6">
+                  {/* Status do Agendamento */}
+                  <Card className="border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between text-gray-800">
+                        <span>Status do Agendamento</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={checkScheduledStatus}
+                          disabled={isCheckingSchedule}
+                          className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                        >
+                          {isCheckingSchedule ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {isCheckingSchedule ? (
+                        <div className="text-center py-8">
+                          <Loader2 className="h-8 w-8 animate-spin text-amber-600 mx-auto mb-4" />
+                          <p className="text-gray-600">Verificando status do agendamento...</p>
                         </div>
-                        <span className="text-sm font-medium text-amber-600">{atrasoPosts}ms</span>
-                      </div>
-                      <Input
-                        id="atraso"
-                        type="number"
-                        min={100}
-                        max={10000}
-                        step={100}
-                        value={atrasoPosts}
-                        onChange={(e) => setAtrasoPosts(Number.parseInt(e.target.value))}
-                        className="border-gray-300"
-                      />
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      onClick={handleEnviarAutomatico}
-                      disabled={isLoading || supabaseStatus !== "connected"}
-                      className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...
-                        </>
+                      ) : scheduledStatus ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span className="text-sm font-medium text-gray-700">Horário Atual:</span>
+                            <span className="text-sm text-gray-900">{scheduledStatus.currentTime}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span className="text-sm font-medium text-gray-700">Horário Permitido:</span>
+                            <span className="text-sm text-gray-900">{scheduledStatus.allowedTime}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span className="text-sm font-medium text-gray-700">Status:</span>
+                            <div className="flex items-center space-x-2">
+                              {scheduledStatus.isWithinAllowedTime ? (
+                                <>
+                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                  <span className="text-sm text-green-600 font-medium">Dentro do Horário</span>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                  <span className="text-sm text-red-600 font-medium">Fora do Horário</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          {!scheduledStatus.isWithinAllowedTime && (
+                            <Alert className="border-amber-200 bg-amber-50">
+                              <AlertTriangle className="h-4 w-4 text-amber-600" />
+                              <AlertDescription className="text-amber-800">
+                                O agendamento automático só funciona entre {autoConfig.startHour}h e {autoConfig.endHour}h da manhã.
+                              </AlertDescription>
+                            </Alert>
+                          )}
+                        </div>
                       ) : (
-                        "Enviar"
+                        <div className="text-center py-8">
+                          <p className="text-gray-600">Clique em "Atualizar" para verificar o status do agendamento.</p>
+                        </div>
                       )}
-                    </Button>
-                  </CardFooter>
-                </Card>
+                    </CardContent>
+                  </Card>
+
+                  {/* Configuração do Agendamento */}
+                  <Card className="border-gray-200 shadow-sm">
+                    <CardHeader>
+                      <CardTitle className="text-gray-800 flex items-center justify-between">
+                        <span>Configuração do Agendamento Automático</span>
+                        {(isConfigLoading || isConfigSaving) && (
+                          <Loader2 className="h-4 w-4 animate-spin text-amber-600" />
+                        )}
+                      </CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Configure os parâmetros para o agendamento automático de posts
+                        {isConfigSaving && (
+                          <span className="text-amber-600 ml-2">Salvando...</span>
+                        )}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Botão On/Off */}
+                      <div className="space-y-2">
+                        <Label className="text-gray-700">Status do Agendamento</Label>
+                        <div className="flex items-center space-x-4">
+                          <Switch
+                            checked={autoConfig.isEnabled}
+                            onCheckedChange={(checked) => updateConfig({ isEnabled: checked })}
+                          />
+                          <span className={`text-sm font-medium ${autoConfig.isEnabled ? 'text-green-600' : 'text-red-600'}`}>
+                            {autoConfig.isEnabled ? 'Ativado' : 'Desativado'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          {autoConfig.isEnabled 
+                            ? 'O agendamento automático está ativo e funcionará entre os horários configurados.'
+                            : 'O agendamento automático está desativado. Ative-o para começar.'
+                          }
+                        </p>
+                      </div>
+
+                      {/* Configuração de Horários */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="startHour" className="text-gray-700">
+                            Horário de Início
+                          </Label>
+                          <Input
+                            id="startHour"
+                            type="number"
+                            min={0}
+                            max={23}
+                            value={autoConfig.startHour}
+                            onChange={(e) => updateConfig({ startHour: Number.parseInt(e.target.value) || 7 })}
+                            className="border-gray-300"
+                            disabled={!autoConfig.isEnabled}
+                          />
+                          <p className="text-xs text-gray-500">Hora do início (0-23)</p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="endHour" className="text-gray-700">
+                            Horário de Fim
+                          </Label>
+                          <Input
+                            id="endHour"
+                            type="number"
+                            min={0}
+                            max={23}
+                            value={autoConfig.endHour}
+                            onChange={(e) => updateConfig({ endHour: Number.parseInt(e.target.value) || 10 })}
+                            className="border-gray-300"
+                            disabled={!autoConfig.isEnabled}
+                          />
+                          <p className="text-xs text-gray-500">Hora do fim (0-23)</p>
+                        </div>
+                      </div>
+
+                      {/* Modo de Postagem */}
+                      <div className="space-y-2">
+                        <Label htmlFor="modoAgendamento" className="text-gray-700">
+                          Modo de Postagem
+                        </Label>
+                        <Select
+                          value={autoConfig.modo}
+                          onValueChange={(value) => updateConfig({ modo: value as "automático" | "personalizado" })}
+                          disabled={!autoConfig.isEnabled}
+                        >
+                          <SelectTrigger className="border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="automático">Automático</SelectItem>
+                            <SelectItem value="personalizado">Personalizado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Campos para modo personalizado */}
+                      {autoConfig.modo === "personalizado" && (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="temaAgendamento" className="text-gray-700">
+                              Tema
+                            </Label>
+                            <Input
+                              id="temaAgendamento"
+                              placeholder="Ex: Café especial da Serra da Canastra"
+                              value={autoConfig.tema}
+                              onChange={(e) => updateConfig({ tema: e.target.value })}
+                              className="border-gray-300"
+                              disabled={!autoConfig.isEnabled}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="publicoAgendamento" className="text-gray-700">
+                              Público-Alvo
+                            </Label>
+                            <Input
+                              id="publicoAgendamento"
+                              placeholder="Ex: Apreciadores de café gourmet"
+                              value={autoConfig.publico_alvo}
+                              onChange={(e) => updateConfig({ publico_alvo: e.target.value })}
+                              className="border-gray-300"
+                              disabled={!autoConfig.isEnabled}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </CardContent>
+                    <CardFooter>
+                      <Button
+                        onClick={executeScheduledPosts}
+                        disabled={isLoading || supabaseStatus !== "connected" || !autoConfig.isEnabled || !scheduledStatus?.isWithinAllowedTime}
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Executando...
+                          </>
+                        ) : (
+                          "Executar Agendamento"
+                        )}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </div>
               </TabsContent>
 
               {/* Aba 2: Postagem Personalizada */}
@@ -1168,3 +1460,4 @@ export default function BlogManagerPage() {
     </div>
   )
 }
+

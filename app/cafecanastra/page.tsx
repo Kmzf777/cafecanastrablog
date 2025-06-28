@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
@@ -20,10 +19,6 @@ import {
   Heart,
   Plus,
   Minus,
-  Coffee,
-  Phone,
-  Mail,
-  MapPin,
   Instagram,
   Facebook,
   Youtube,
@@ -43,8 +38,7 @@ export default function CafeCanastraWebsite() {
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
-    assunto: "",
-    mensagem: ""
+    whatsapp: ""
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState("")
@@ -249,16 +243,24 @@ export default function CafeCanastraWebsite() {
     setSubmitMessage("")
 
     try {
-      // Simular envio do formulário
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const response = await fetch('/api/landing-webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
       
-      // Aqui você pode integrar com um serviço de email como SendGrid, EmailJS, etc.
-      console.log("Dados do formulário:", formData)
-      
-      setSubmitMessage("Mensagem enviada com sucesso! Entraremos em contato em breve.")
-      setFormData({ nome: "", email: "", assunto: "", mensagem: "" })
+      if (result.success) {
+        setSubmitMessage("Dados enviados com sucesso! Entraremos em contato em breve.")
+        setFormData({ nome: "", email: "", whatsapp: "" })
+      } else {
+        setSubmitMessage("Erro ao enviar dados. Tente novamente.")
+      }
     } catch (error) {
-      setSubmitMessage("Erro ao enviar mensagem. Tente novamente.")
+      setSubmitMessage("Erro ao enviar dados. Tente novamente.")
     } finally {
       setIsSubmitting(false)
     }
@@ -337,7 +339,10 @@ export default function CafeCanastraWebsite() {
 
             {/* Desktop CTA */}
             <div className="hidden lg:block">
-              <Button className="bg-amber-600 hover:bg-amber-700 text-white text-sm xl:text-base">
+              <Button 
+                className="bg-amber-600 hover:bg-amber-700 text-white text-sm xl:text-base"
+                onClick={() => scrollToSection("contato")}
+              >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Fale Conosco
               </Button>
@@ -370,7 +375,10 @@ export default function CafeCanastraWebsite() {
                     {item.name}
                   </button>
                 ))}
-                <Button className="bg-amber-600 hover:bg-amber-700 text-white mt-3">
+                <Button 
+                  className="bg-amber-600 hover:bg-amber-700 text-white mt-3"
+                  onClick={() => scrollToSection("contato")}
+                >
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Fale Conosco
                 </Button>
@@ -409,6 +417,7 @@ export default function CafeCanastraWebsite() {
             <Button
               size="lg"
               className="bg-amber-600 hover:bg-amber-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base"
+              onClick={() => scrollToSection("contato")}
             >
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Solicitar Atendimento
@@ -618,6 +627,7 @@ export default function CafeCanastraWebsite() {
 
                   <Button
                     className={`w-full sm:w-auto ${getColorClass(key, "button")} text-white text-sm sm:text-base`}
+                    onClick={() => scrollToSection("contato")}
                   >
                     <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                     Solicitar Informações
@@ -670,7 +680,10 @@ export default function CafeCanastraWebsite() {
                   <CardContent className="p-4 sm:p-6">
                     <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">{kit.name}</h3>
                     <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">{kit.description}</p>
-                    <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm sm:text-base">
+                    <Button 
+                      className="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm sm:text-base"
+                      onClick={() => scrollToSection("contato")}
+                    >
                       <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Solicitar Informações
                     </Button>
@@ -869,120 +882,75 @@ export default function CafeCanastraWebsite() {
           >
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold mb-4 text-gray-800">Fale Conosco</h2>
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-              Estamos aqui para ajudar você a descobrir o café perfeito
+              Entraremos em contato em até 1 minuto!
             </p>
           </motion.div>
 
-          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="w-full"
-            >
-              <Card className="shadow-lg">
-                <CardContent className="p-6 sm:p-8">
-                  <div className="text-center mb-6 sm:mb-8">
-                    <Coffee className="w-12 h-12 sm:w-16 sm:h-16 text-amber-600 mx-auto mb-4" />
-                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Atendimento Rápido</h3>
-                    <p className="text-sm sm:text-base text-gray-600">
-                      Entre em contato pelo WhatsApp e receba atendimento em até 30 minutos
-                    </p>
-                  </div>
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white text-base sm:text-lg py-3 sm:py-4">
-                    <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-                    <a href="https://wa.me/5537999999999?text=Olá! Gostaria de saber mais sobre os cafés Canastra." target="_blank" rel="noopener noreferrer" className="text-white">
-                      Conversar pelo WhatsApp
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">(37) 3433-1234</span>
-                </div>
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">contato@cafecanastra.com.br</span>
-                </div>
-                <div className="flex items-center space-x-3 sm:space-x-4">
-                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Serra da Canastra, Minas Gerais</span>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="w-full"
-            >
-              <Card className="shadow-lg">
-                <CardContent className="p-6 sm:p-8">
-                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6">Envie uma mensagem</h3>
-                  <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Input 
-                        name="nome"
-                        value={formData.nome}
-                        onChange={handleInputChange}
-                        placeholder="Seu nome" 
-                        className="border-gray-300 text-sm sm:text-base" 
-                        required
-                      />
-                      <Input 
-                        name="email"
-                        type="email" 
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="Seu e-mail" 
-                        className="border-gray-300 text-sm sm:text-base" 
-                        required
-                      />
-                    </div>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="w-full max-w-2xl mx-auto"
+          >
+            <Card className="shadow-lg">
+              <CardContent className="p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 text-center">Entrar em Contato Agora</h3>
+                <form onSubmit={handleFormSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
                     <Input 
-                      name="assunto"
-                      value={formData.assunto}
+                      name="nome"
+                      value={formData.nome}
                       onChange={handleInputChange}
-                      placeholder="Assunto" 
+                      placeholder="Seu nome completo" 
                       className="border-gray-300 text-sm sm:text-base" 
                       required
                     />
-                    <Textarea
-                      name="mensagem"
-                      value={formData.mensagem}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
+                    <Input 
+                      name="email"
+                      type="email" 
+                      value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="Sua mensagem"
-                      rows={4}
-                      className="border-gray-300 text-sm sm:text-base resize-none"
+                      placeholder="Seu melhor e-mail" 
+                      className="border-gray-300 text-sm sm:text-base" 
                       required
                     />
-                    {submitMessage && (
-                      <div className={`p-3 rounded-lg text-sm ${
-                        submitMessage.includes("sucesso") 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-red-100 text-red-800"
-                      }`}>
-                        {submitMessage}
-                      </div>
-                    )}
-                    <Button 
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm sm:text-base py-2 sm:py-3"
-                    >
-                      {isSubmitting ? "Enviando..." : "Enviar Mensagem"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">WhatsApp</label>
+                    <Input 
+                      name="whatsapp"
+                      value={formData.whatsapp}
+                      onChange={handleInputChange}
+                      placeholder="(DD)XXXXX-XXXX" 
+                      className="border-gray-300 text-sm sm:text-base" 
+                      required
+                    />
+                  </div>
+                  {submitMessage && (
+                    <div className={`p-3 rounded-lg text-sm ${
+                      submitMessage.includes("sucesso") 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-red-100 text-red-800"
+                    }`}>
+                      {submitMessage}
+                    </div>
+                  )}
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm sm:text-base py-3 sm:py-4"
+                  >
+                    {isSubmitting ? "Enviando..." : "Enviar"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </section>
 
@@ -1072,11 +1040,13 @@ export default function CafeCanastraWebsite() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        <a href="https://wa.me/5537999999999?text=Olá! Gostaria de saber mais sobre os cafés Canastra." target="_blank" rel="noopener noreferrer">
-          <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg p-3 sm:p-4">
-            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-          </Button>
-        </a>
+        <Button 
+          size="lg" 
+          className="bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg p-3 sm:p-4"
+          onClick={() => scrollToSection("contato")}
+        >
+          <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+        </Button>
       </motion.div>
 
       <BlogNotification />
