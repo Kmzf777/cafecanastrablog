@@ -172,7 +172,10 @@ export async function middleware(request: NextRequest) {
     'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 'python', 'php'
   ]
   
-  if (maliciousBots.some(bot => userAgent.toLowerCase().includes(bot))) {
+  if (
+    maliciousBots.some(bot => userAgent.toLowerCase().includes(bot)) &&
+    !pathname.startsWith('/api/scheduled-posts')
+  ) {
     return new NextResponse('Forbidden', { status: 403 })
   }
   
