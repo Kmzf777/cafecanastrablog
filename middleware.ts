@@ -16,6 +16,7 @@ const PUBLIC_ROUTES = [
   '/api/login',
   '/api/auth/verify',
   '/api/auth/logout',
+  '/api/scheduled-posts',
   '/cafecanastra',
   '/blog',
   '/',
