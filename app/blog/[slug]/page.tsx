@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getPostBySlug, getRecentPosts } from "@/lib/supabase"
+import { calculateReadingTime } from "@/lib/utils"
 import ClientBlogPostPage from "./ClientBlogPostPage"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -118,7 +119,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Filtrar posts relacionados (excluindo o atual)
   const relatedPosts = recentPosts.filter((p) => p.id !== post.id).slice(0, 4)
 
-  // Calcular tempo de leitura
+  // Calcular tempo de leitura usando a função utilitária
+  const readingTime = calculateReadingTime(post)
   const wordCount = [
     post.resumo,
     post.secao_1_texto,
@@ -133,8 +135,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     .filter(Boolean)
     .join(" ")
     .split(" ").length
-
-  const readingTime = Math.ceil(wordCount / 200)
 
   return (
     <>

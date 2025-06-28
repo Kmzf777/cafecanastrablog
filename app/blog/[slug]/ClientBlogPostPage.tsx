@@ -7,6 +7,7 @@ import { ArrowLeft, Coffee, MessageCircle, Calendar, Clock, Facebook, Twitter, L
 import Link from "next/link"
 import { motion } from "framer-motion"
 import type { BlogPost } from "@/lib/supabase"
+import { calculateReadingTime } from "@/lib/utils"
 import BlogBreadcrumb from "@/components/blog-breadcrumb"
 import OptimizedImage from "@/components/optimized-image"
 import TableOfContents from "@/components/table-of-contents"
@@ -17,25 +18,7 @@ interface ClientBlogPostPageProps {
 }
 
 export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPostPageProps) {
-  const [readingTime] = useState(() => {
-    // Calcular tempo de leitura (aproximadamente 200 palavras por minuto)
-    const wordCount = [
-      post.resumo,
-      post.secao_1_texto,
-      post.secao_2_texto,
-      post.secao_3_texto,
-      post.secao_4_texto,
-      post.secao_5_texto,
-      post.secao_6_texto,
-      post.secao_7_texto,
-      post.conclusao,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .split(" ").length
-
-    return Math.ceil(wordCount / 200)
-  })
+  const readingTime = calculateReadingTime(post)
 
   // Gerar seções para a tabela de conteúdo
   const sections = useMemo(() => {

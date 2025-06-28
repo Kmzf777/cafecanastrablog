@@ -7,6 +7,7 @@ import { ArrowRight, Coffee, Calendar, Clock } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { getRecentPostsClient, type BlogPost } from "@/lib/supabase"
+import { calculateReadingTime } from "@/lib/utils"
 
 export default function BlogSection() {
   const [posts, setPosts] = useState<BlogPost[]>([])
@@ -39,26 +40,6 @@ export default function BlogSection() {
     } catch {
       return "Data inválida"
     }
-  }
-
-  const calculateReadingTime = (post: BlogPost) => {
-    // Estimar tempo de leitura baseado no conteúdo
-    const content = [
-      post.resumo,
-      post.secao_1_texto,
-      post.secao_2_texto,
-      post.secao_3_texto,
-      post.secao_4_texto,
-      post.secao_5_texto,
-      post.secao_6_texto,
-      post.secao_7_texto,
-      post.conclusao,
-    ]
-      .filter(Boolean)
-      .join(" ")
-
-    const wordCount = content.split(" ").length
-    return Math.ceil(wordCount / 200) // ~200 palavras por minuto
   }
 
   return (
@@ -161,7 +142,7 @@ export default function BlogSection() {
                     )}
 
                     {/* Read More Button */}
-                    <Link href={`/blog/${post.slug}`} className="mt-auto">
+                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="mt-auto">
                       <Button
                         variant="outline"
                         className="w-full border-amber-500 text-amber-600 hover:bg-amber-50 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 bg-transparent"
@@ -169,7 +150,7 @@ export default function BlogSection() {
                         Ler mais
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                       </Button>
-                    </Link>
+                    </a>
                   </CardContent>
                 </Card>
               </motion.div>
