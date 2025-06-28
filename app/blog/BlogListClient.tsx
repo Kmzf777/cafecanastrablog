@@ -4,8 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Coffee, Calendar, Clock, Search, Filter, Tag } from "lucide-react"
+import { ArrowLeft, Coffee, Calendar, Clock, Search } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import type { BlogPost } from "@/lib/supabase"
@@ -18,19 +17,13 @@ export default function BlogListClient({ initialPosts }: BlogListClientProps) {
   const [posts] = useState<BlogPost[]>(initialPosts)
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(initialPosts)
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedMode, setSelectedMode] = useState<"todos" | "automático" | "personalizado">("todos")
 
   const handleSearch = (term: string) => {
     setSearchTerm(term)
-    filterPosts(term, selectedMode)
+    filterPosts(term)
   }
 
-  const handleModeFilter = (mode: "todos" | "automático" | "personalizado") => {
-    setSelectedMode(mode)
-    filterPosts(searchTerm, mode)
-  }
-
-  const filterPosts = (term: string, mode: "todos" | "automático" | "personalizado") => {
+  const filterPosts = (term: string) => {
     let filtered = posts
 
     // Filtro por busca
@@ -40,11 +33,6 @@ export default function BlogListClient({ initialPosts }: BlogListClientProps) {
           post.titulo.toLowerCase().includes(term.toLowerCase()) ||
           (post.resumo && post.resumo.toLowerCase().includes(term.toLowerCase())),
       )
-    }
-
-    // Filtro por modo
-    if (mode !== "todos") {
-      filtered = filtered.filter((post) => post.modo === mode)
     }
 
     setFilteredPosts(filtered)
@@ -121,49 +109,6 @@ export default function BlogListClient({ initialPosts }: BlogListClientProps) {
                 className="pl-10 border-gray-300"
               />
             </div>
-
-            {/* Mode Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-500" />
-              <div className="flex gap-2">
-                <Button
-                  variant={selectedMode === "todos" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleModeFilter("todos")}
-                  className={
-                    selectedMode === "todos"
-                      ? "bg-amber-600 hover:bg-amber-700 text-white"
-                      : "border-gray-300 text-gray-600 hover:bg-gray-50 bg-transparent"
-                  }
-                >
-                  Todos
-                </Button>
-                <Button
-                  variant={selectedMode === "automático" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleModeFilter("automático")}
-                  className={
-                    selectedMode === "automático"
-                      ? "bg-blue-600 hover:bg-blue-700 text-white"
-                      : "border-blue-300 text-blue-600 hover:bg-blue-50 bg-transparent"
-                  }
-                >
-                  Automático
-                </Button>
-                <Button
-                  variant={selectedMode === "personalizado" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleModeFilter("personalizado")}
-                  className={
-                    selectedMode === "personalizado"
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "border-green-300 text-green-600 hover:bg-green-50 bg-transparent"
-                  }
-                >
-                  Personalizado
-                </Button>
-              </div>
-            </div>
           </div>
 
           {/* Results count */}
@@ -188,18 +133,15 @@ export default function BlogListClient({ initialPosts }: BlogListClientProps) {
           >
             <Coffee className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              {searchTerm || selectedMode !== "todos" ? "Nenhum post encontrado" : "Nenhum post publicado ainda"}
+              {searchTerm ? "Nenhum post encontrado" : "Nenhum post publicado ainda"}
             </h3>
             <p className="text-gray-600 mb-6">
-              {searchTerm || selectedMode !== "todos"
-                ? "Tente ajustar os filtros de busca."
-                : "Em breve teremos conteúdos incríveis sobre café especial."}
+              {searchTerm ? "Tente ajustar os filtros de busca." : "Em breve teremos conteúdos incríveis sobre café especial."}
             </p>
-            {(searchTerm || selectedMode !== "todos") && (
+            {searchTerm && (
               <Button
                 onClick={() => {
                   setSearchTerm("")
-                  setSelectedMode("todos")
                   setFilteredPosts(posts)
                 }}
                 className="bg-amber-600 hover:bg-amber-700 text-white"
@@ -231,19 +173,6 @@ export default function BlogListClient({ initialPosts }: BlogListClientProps) {
                         <Coffee className="w-16 h-16 text-amber-600 opacity-50 group-hover:scale-110 transition-transform duration-300" />
                       </div>
                     )}
-                    <div className="absolute top-3 right-3">
-                      <Badge
-                        variant="outline"
-                        className={`${
-                          post.modo === "automático"
-                            ? "bg-blue-100 border-blue-200 text-blue-800"
-                            : "bg-green-100 border-green-200 text-green-800"
-                        }`}
-                      >
-                        <Tag className="w-3 h-3 mr-1" />
-                        {post.modo}
-                      </Badge>
-                    </div>
                   </div>
 
                   <CardContent className="p-6 flex flex-col flex-1">

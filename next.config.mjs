@@ -17,7 +17,6 @@ const nextConfig = {
   poweredByHeader: false,
   generateEtags: false,
   reactStrictMode: true,
-  swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

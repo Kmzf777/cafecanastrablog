@@ -241,7 +241,7 @@ export async function getRecentPostsClient(limit = 4): Promise<BlogPost[]> {
 
     const { data, error } = await supabase
       .from("blog_posts")
-      .select("id, titulo, slug, created_at")
+      .select("id, titulo, slug, created_at, imagem_titulo, alt_imagem_titulo, resumo")
       .eq("status", "publicado")
       .order("created_at", { ascending: false })
       .limit(limit)

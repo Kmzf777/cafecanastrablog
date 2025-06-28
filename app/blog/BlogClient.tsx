@@ -176,15 +176,6 @@ function BlogListClient({ initialPosts }: { initialPosts: BlogPost[] }) {
                           <Coffee className="w-16 h-16 text-amber-600 opacity-50" />
                         </div>
                       )}
-                      <div className="absolute top-3 left-3">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            post.modo === "automático" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
-                          }`}
-                        >
-                          {post.modo}
-                        </span>
-                      </div>
                     </div>
 
                     <CardContent className="p-6 flex flex-col flex-grow">
@@ -199,18 +190,7 @@ function BlogListClient({ initialPosts }: { initialPosts: BlogPost[] }) {
 
                       <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">{post.resumo}</p>
 
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-gray-400">
-                          {post.meta_keywords
-                            ?.split(",")
-                            .slice(0, 2)
-                            .map((tag, i) => (
-                              <span key={i} className="inline-block bg-gray-100 px-2 py-1 rounded mr-1">
-                                {tag.trim()}
-                              </span>
-                            ))}
-                        </div>
-
+                      <div className="flex items-center justify-end">
                         <Link href={`/blog/${post.slug}`}>
                           <Button
                             variant="ghost"

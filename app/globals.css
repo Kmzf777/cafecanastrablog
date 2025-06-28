@@ -200,3 +200,160 @@ html {
   z-index: 9998;
   transition: all 0.1s ease;
 }
+
+/* Blog post improvements */
+.blog-content {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.blog-sidebar {
+  position: relative;
+  z-index: 10;
+}
+
+.blog-sidebar-card {
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive text handling */
+.text-overflow-safe {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+/* Improved card content */
+.card-content-safe {
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Blog content improvements */
+.blog-content .prose {
+  max-width: none;
+  color: inherit;
+}
+
+.blog-content .prose h1,
+.blog-content .prose h2,
+.blog-content .prose h3,
+.blog-content .prose h4,
+.blog-content .prose h5,
+.blog-content .prose h6 {
+  color: #1f2937;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.blog-content .prose h1 {
+  font-size: 2.25rem;
+  margin-top: 0;
+}
+
+.blog-content .prose h2 {
+  font-size: 1.875rem;
+}
+
+.blog-content .prose h3 {
+  font-size: 1.5rem;
+}
+
+.blog-content .prose p {
+  margin-bottom: 1.25em;
+  line-height: 1.75;
+  color: #374151;
+}
+
+.blog-content .prose ul,
+.blog-content .prose ol {
+  margin-bottom: 1.25em;
+  padding-left: 1.5em;
+}
+
+.blog-content .prose li {
+  margin-bottom: 0.5em;
+  line-height: 1.75;
+}
+
+.blog-content .prose blockquote {
+  border-left: 4px solid #f59e0b;
+  padding-left: 1rem;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.blog-content .prose a {
+  color: #d97706;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.blog-content .prose a:hover {
+  color: #b45309;
+}
+
+.blog-content .prose strong {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.blog-content .prose em {
+  font-style: italic;
+}
+
+.blog-content .prose code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  color: #dc2626;
+}
+
+.blog-content .prose pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+.blog-content .prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.blog-content .prose img {
+  border-radius: 0.5rem;
+  margin: 1.5em 0;
+}
+
+.blog-content .prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.blog-content .prose th,
+.blog-content .prose td {
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.blog-content .prose th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}

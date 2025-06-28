@@ -2,10 +2,11 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getPostBySlug, getRecentPosts } from "@/lib/supabase"
 import ClientBlogPostPage from "./ClientBlogPostPage"
-import Head from "next/head"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
+  console.log("=== GERANDO METADATA PARA SLUG ===", slug)
+  
   const post = await getPostBySlug(slug)
 
   if (!post) {
@@ -35,16 +36,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  return {
-    title: post.title || `${post.titulo} | Blog Café Canastra`,
-    description: post.meta_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra.",
-    keywords: post.meta_keywords || "café especial, serra da canastra, café brasileiro",
+  // Garantir que todos os campos tenham valores padrão
+  const title = post.title || post.titulo || "Blog Café Canastra"
+  const description = post.meta_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra."
+  const keywords = post.meta_keywords || "café especial, serra da canastra, café brasileiro"
+  const ogTitle = post.og_title || post.titulo || title
+  const ogDescription = post.og_description || post.resumo || description
+  const ogUrl = post.og_url || `https://cafecanastra.com/blog/${slug}`
+  const twitterTitle = post.twitter_title || post.titulo || title
+  const twitterDescription = post.twitter_description || post.resumo || description
+  const imageUrl = post.imagem_titulo || "/placeholder.svg?height=630&width=1200&text=Café+Canastra+Blog"
+
+  const metadata: Metadata = {
+    title: `${title} | Blog Café Canastra`,
+    description: description,
+    keywords: keywords,
     authors: [{ name: "Equipe Café Canastra" }],
     robots: "index, follow",
+    metadataBase: new URL('https://cafecanastra.com'),
     openGraph: {
-      title: post.og_title || post.titulo || "Blog Café Canastra",
-      description: post.og_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra.",
-      url: post.og_url || `https://cafecanastra.com/blog/${slug}`,
+      title: ogTitle,
+      description: ogDescription,
+      url: ogUrl,
       type: "article",
       publishedTime: post.created_at,
       authors: ["Equipe Café Canastra"],
@@ -52,7 +65,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       locale: "pt_BR",
       images: [
         {
-          url: post.imagem_titulo || "/placeholder.svg?height=630&width=1200&text=Café+Canastra+Blog",
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: post.alt_imagem_titulo || post.titulo || "Blog Café Canastra",
@@ -63,22 +76,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: "summary_large_image",
       site: "@cafecanastra",
       creator: "@cafecanastra",
-      title: post.twitter_title || post.titulo || "Blog Café Canastra",
-      description:
-        post.twitter_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra.",
-      images: [post.imagem_titulo || "/placeholder.svg?height=630&width=1200&text=Café+Canastra+Blog"],
+      title: twitterTitle,
+      description: twitterDescription,
+      images: [imageUrl],
     },
     alternates: {
-      canonical: post.og_url || `https://cafecanastra.com/blog/${slug}`,
+      canonical: ogUrl,
     },
     other: {
       "article:author": "Equipe Café Canastra",
       "article:published_time": post.created_at,
       "article:modified_time": post.updated_at,
       "article:section": "Blog",
-      "article:tag": post.meta_keywords || "café especial, serra da canastra",
+      "article:tag": keywords,
     },
   }
+
+  console.log("✅ Metadata gerada com sucesso para:", title)
+
+  return metadata
 }
 
 export async function generateStaticParams() {
@@ -87,8 +103,12 @@ export async function generateStaticParams() {
 
 export const dynamicParams = true
 
+// Forçar regeneração das páginas para garantir metatags atualizadas
+export const revalidate = 0
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  
   const [post, recentPosts] = await Promise.all([getPostBySlug(slug), getRecentPosts(5)])
 
   if (!post) {
@@ -118,16 +138,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
-      <Head>
-        <title>{post["<title>"] || post.title || `${post.titulo} | Blog Café Canastra`}</title>
-        <meta name="description" content={post['meta name="description"'] || post.meta_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra."} />
-        <meta name="keywords" content={post['meta name="keywords"'] || post.meta_keywords || "café especial, serra da canastra, café brasileiro"} />
-        <meta property="og:url" content={post['meta property="og:url"'] || post.og_url || `https://cafecanastra.com/blog/${slug}`} />
-        <meta property="og:title" content={post['meta property="og:title"'] || post.og_title || post.titulo || "Blog Café Canastra"} />
-        <meta property="og:description" content={post['meta property="og:description"'] || post.og_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra."} />
-        <meta property="twitter:title" content={post['meta property="twitter:title"'] || post.twitter_title || post.titulo || "Blog Café Canastra"} />
-        <meta property="twitter:description" content={post['meta property="twitter:description"'] || post.twitter_description || post.resumo || "Descubra os segredos do café especial da Serra da Canastra."} />
-      </Head>
       {/* Structured Data para SEO */}
       <script
         type="application/ld+json"

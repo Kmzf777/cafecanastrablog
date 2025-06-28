@@ -433,6 +433,9 @@ export default function CafeCanastraWebsite() {
         </motion.div>
       </section>
 
+      {/* Blog Section */}
+      <BlogSection />
+
       {/* Nossa História */}
       <section id="nossa-historia" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
         <div className="w-full max-w-7xl mx-auto">
@@ -805,9 +808,6 @@ export default function CafeCanastraWebsite() {
           </div>
         </div>
       </section>
-
-      {/* Blog Section */}
-      <BlogSection />
 
       {/* FAQ Section */}
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gray-50">

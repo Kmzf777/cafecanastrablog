@@ -3,8 +3,7 @@
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Coffee, MessageCircle, Calendar, Tag, Clock, Facebook, Twitter, Linkedin, Copy } from "lucide-react"
+import { ArrowLeft, Coffee, MessageCircle, Calendar, Clock, Facebook, Twitter, Linkedin, Copy } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import type { BlogPost } from "@/lib/supabase"
@@ -184,7 +183,7 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
       <main className="max-w-7xl mx-auto px-4 py-6 lg:py-8" role="main" id="main-content">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Article Content */}
-          <article className="lg:col-span-3" itemScope itemType="https://schema.org/Article">
+          <article className="lg:col-span-3 blog-content" itemScope itemType="https://schema.org/Article">
             {/* Breadcrumb */}
             <BlogBreadcrumb postTitle={post.titulo} postSlug={post.slug} />
 
@@ -237,15 +236,6 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
                   <Clock className="w-4 h-4 mr-2" />
                   <span>{readingTime} min de leitura</span>
                 </div>
-                <Badge
-                  variant="outline"
-                  className={`${
-                    post.modo === "automático" ? "border-blue-200 text-blue-800" : "border-green-200 text-green-800"
-                  }`}
-                >
-                  <Tag className="w-3 h-3 mr-1" />
-                  {post.modo}
-                </Badge>
               </div>
 
               {/* Share buttons */}
@@ -428,15 +418,15 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
           </article>
 
           {/* Sidebar */}
-          <aside className="lg:col-span-1" role="complementary" aria-label="Conteúdo relacionado">
-            <div className="sticky top-24 space-y-6">
+          <aside className="lg:col-span-1 blog-sidebar" role="complementary" aria-label="Conteúdo relacionado">
+            <div className="space-y-6">
               {/* Tabela de Conteúdo */}
               {sections.length > 0 && <TableOfContents sections={sections} />}
 
               {/* Posts Relacionados */}
               {relatedPosts.length > 0 && (
-                <Card className="shadow-sm">
-                  <CardContent className="p-4 lg:p-6">
+                <Card className="shadow-sm blog-sidebar-card">
+                  <CardContent className="p-4 lg:p-6 card-content-safe">
                     <h3 className="text-lg font-bold text-gray-900 mb-4">Posts Relacionados</h3>
                     <nav className="space-y-4" role="navigation" aria-label="Posts relacionados">
                       {relatedPosts.map((relatedPost) => (
@@ -446,7 +436,7 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
                               <Coffee className="w-6 h-6 text-amber-600" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-semibold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-1">
+                              <h4 className="text-sm font-semibold text-gray-900 group-hover:text-amber-600 transition-colors line-clamp-2 mb-1 break-words text-overflow-safe">
                                 {relatedPost.titulo}
                               </h4>
                               <p className="text-xs text-gray-500">
@@ -462,10 +452,10 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
               )}
 
               {/* Newsletter */}
-              <Card className="shadow-sm">
-                <CardContent className="p-4 lg:p-6">
+              <Card className="shadow-sm blog-sidebar-card">
+                <CardContent className="p-4 lg:p-6 card-content-safe">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Newsletter</h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-600 mb-4 break-words text-overflow-safe">
                     Receba novidades sobre café e nossos produtos diretamente no seu e-mail.
                   </p>
                   <form className="space-y-3" role="form" aria-label="Formulário de newsletter">
@@ -483,11 +473,11 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
               </Card>
 
               {/* CTA Café */}
-              <Card className="shadow-sm bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200">
-                <CardContent className="p-4 lg:p-6 text-center">
+              <Card className="shadow-sm bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200 blog-sidebar-card">
+                <CardContent className="p-4 lg:p-6 text-center card-content-safe">
                   <Coffee className="w-12 h-12 text-amber-600 mx-auto mb-3" />
                   <h3 className="text-lg font-bold text-gray-900 mb-2">Experimente nossos cafés</h3>
-                  <p className="text-sm text-gray-600 mb-4">Descubra sabores únicos da Serra da Canastra</p>
+                  <p className="text-sm text-gray-600 mb-4 break-words text-overflow-safe">Descubra sabores únicos da Serra da Canastra</p>
                   <a
                     href="https://loja.cafecanastra.com"
                     className="inline-flex items-center justify-center w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors text-sm"

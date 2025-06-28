@@ -123,9 +123,17 @@ export default function BlogSection() {
                 <Card className="overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group h-full">
                   {/* Post Image */}
                   <div className="aspect-video bg-gradient-to-br from-amber-100 to-yellow-100 relative overflow-hidden">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Coffee className="w-16 h-16 text-amber-600 opacity-50 group-hover:scale-110 transition-transform duration-300" />
-                    </div>
+                    {post.imagem_titulo ? (
+                      <img
+                        src={post.imagem_titulo}
+                        alt={post.alt_imagem_titulo || post.titulo}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Coffee className="w-16 h-16 text-amber-600 opacity-50 group-hover:scale-110 transition-transform duration-300" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 

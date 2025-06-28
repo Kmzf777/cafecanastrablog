@@ -844,15 +844,6 @@ export default function BlogManagerPage() {
                                   <Coffee className="w-16 h-16 text-amber-600 opacity-50" />
                                 </div>
                               )}
-                              <div className="absolute top-2 right-2">
-                                <span
-                                  className={`px-2 py-1 text-xs rounded-full font-medium ${
-                                    post.modo === "automático" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
-                                  }`}
-                                >
-                                  {post.modo}
-                                </span>
-                              </div>
                               <div className="absolute top-2 left-2">
                                 <span
                                   className={`px-2 py-1 text-xs rounded-full font-medium ${

@@ -46,13 +46,13 @@ export default function TableOfContents({ sections }: TableOfContentsProps) {
   if (sections.length === 0) return null
 
   return (
-    <Card className="shadow-sm sticky top-24">
+    <Card className="shadow-sm">
       <CardContent className="p-4 lg:p-6">
         <div className="flex items-center gap-2 mb-4">
           <List className="w-5 h-5 text-amber-600" />
           <h3 className="text-lg font-bold text-gray-900">Índice</h3>
         </div>
-        <nav className="space-y-2" role="navigation" aria-label="Tabela de conteúdo">
+        <nav className="space-y-2 max-h-96 overflow-y-auto" role="navigation" aria-label="Tabela de conteúdo">
           {sections.map((section) => (
             <Button
               key={section.id}
@@ -67,7 +67,7 @@ export default function TableOfContents({ sections }: TableOfContentsProps) {
               style={{ paddingLeft: `${(section.level - 2) * 16 + 8}px` }}
             >
               <ChevronRight className="w-3 h-3 mr-2 flex-shrink-0" />
-              <span className="text-sm leading-relaxed">{section.title}</span>
+              <span className="text-sm leading-relaxed break-words">{section.title}</span>
             </Button>
           ))}
         </nav>
