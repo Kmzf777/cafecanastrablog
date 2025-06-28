@@ -39,6 +39,7 @@ import {
   LogOut,
   User,
   EyeOff,
+  Shield,
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -50,7 +51,6 @@ import {
   debugEnvironmentVariables,
 } from "@/lib/supabase"
 import SupabaseStatus from "@/components/supabase-status"
-import { parse } from 'cookie'
 
 export default function BlogManagerPage() {
   console.log("[DEBUG] BlogManagerPage renderizou");
@@ -81,17 +81,32 @@ export default function BlogManagerPage() {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Checa o cookie admin-auth
-    if (typeof document !== 'undefined') {
-      const cookies = parse(document.cookie || '')
-      if (cookies['admin-auth'] === 'true') {
+    // Verificar autenticação via API
+    checkAuthStatus()
+  }, [])
+
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'GET',
+        credentials: 'include', // Incluir cookies
+      })
+      
+      if (response.ok) {
         setIsAuthorized(true)
       } else {
         setIsAuthorized(false)
+        // Redirecionar para login se não estiver autenticado
+        window.location.href = '/login'
       }
+    } catch (error) {
+      console.error('Erro ao verificar autenticação:', error)
+      setIsAuthorized(false)
+      window.location.href = '/login'
+    } finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   // Verificar status do Supabase na inicialização
   useEffect(() => {
@@ -107,10 +122,19 @@ export default function BlogManagerPage() {
     }
   }, [isAuthorized, activeTab])
 
-  const handleLogout = () => {
-    // Remove o cookie admin-auth
-    document.cookie = 'admin-auth=; Max-Age=0; path=/;'
-    window.location.href = '/login'
+  const handleLogout = async () => {
+    try {
+      // Chamar API de logout
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+    } catch (error) {
+      console.error('Erro no logout:', error)
+    } finally {
+      // Redirecionar para login
+      window.location.href = '/login'
+    }
   }
 
   const checkSupabaseStatus = async () => {
