@@ -416,10 +416,10 @@ export default function CafeCanastraWebsite() {
           transition={{ duration: 1, delay: 0.5 }}
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-4 sm:mb-6 leading-tight">
-            O Café que Eterniza Momentos
+            O Café that Eternizes Moments
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-2xl mx-auto font-light leading-relaxed">
-            Cultivado com alma mineira desde 1985, cada grão leva até você o sabor puro da Serra da Canastra.
+            Cultivated with mineira soul since 1985, each grain takes you to the pure taste of Serra da Canastra.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
@@ -429,7 +429,7 @@ export default function CafeCanastraWebsite() {
               onClick={() => scrollToSection("contato")}
             >
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Solicitar Atendimento
+              Request Service
             </Button>
             <Button
               size="lg"
@@ -437,7 +437,7 @@ export default function CafeCanastraWebsite() {
               style={{ boxShadow: 'none' }}
             >
               <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Nossa História
+              Our Story
             </Button>
           </div>
         </motion.div>
@@ -455,7 +455,7 @@ export default function CafeCanastraWebsite() {
       <section id="diferenciais" className="py-16 lg:py-24 bg-gradient-to-b from-amber-50 to-white">
         <div className="w-full px-2 sm:px-4 lg:px-8 mx-auto">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4">O que faz do Café Canastra algo único?</h2>
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4">What Makes Café Canastra Unique?</h2>
           </div>
           <div className="w-full grid gap-6 grid-cols-2 lg:grid-cols-4">
             {/* Card 1 */}
@@ -463,8 +463,8 @@ export default function CafeCanastraWebsite() {
               <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
                 <Mountain className="w-8 h-8 text-amber-600" />
               </div>
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">Origem Serra da Canastra</h3>
-              <p className="text-gray-700 text-sm hidden sm:block">Só torramos cafés que nós mesmos cultivamos, colhemos e selecionamos. Sem intermediários, sem misturas.</p>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Serra da Canastra Origin</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">We only roast coffees that we ourselves grow, harvest, and select. No intermediaries, no mixtures.</p>
             </div>
             {/* Card 2 */}
             <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
@@ -472,23 +472,23 @@ export default function CafeCanastraWebsite() {
                 <LocateFixed className="w-8 h-8 text-amber-600" />
               </div>
               <h3 className="font-semibold text-lg text-gray-900 mb-2">Single Origin</h3>
-              <p className="text-gray-700 text-sm hidden sm:block">Cada café vem de um lote único, refletindo as nuances do nosso terroir.</p>
+              <p className="text-gray-700 text-sm hidden sm:block">Each coffee comes from a single batch, reflecting the nuances of our terroir.</p>
             </div>
             {/* Card 3 */}
             <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
               <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
                 <Coffee className="w-8 h-8 text-amber-600" />
               </div>
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">Da fazenda à torrefação</h3>
-              <p className="text-gray-700 text-sm hidden sm:block">Controle absoluto da qualidade em todas as etapas.</p>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">From Farm to Roasting</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">Absolute control over quality at every step.</p>
             </div>
             {/* Card 4 */}
             <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
               <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
                 <HeartHandshake className="w-8 h-8 text-amber-600" />
               </div>
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">Respeito às pessoas e ao meio ambiente</h3>
-              <p className="text-gray-700 text-sm hidden sm:block">Valorizamos nossa comunidade local, nossos colaboradores e cultivamos práticas sustentáveis que protegem a Serra da Canastra.</p>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Respect for People and the Environment</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">We value our local community, our collaborators, and cultivate sustainable practices that protect Serra da Canastra.</p>
             </div>
           </div>
         </div>
@@ -526,16 +526,16 @@ export default function CafeCanastraWebsite() {
               className="w-full order-1 lg:order-2"
             >
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold mb-4 sm:mb-6 text-gray-800">
-                Nossa História
+                Our Story
               </h2>
               <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6 leading-relaxed">
-                Desde 1985, a família Canastra dedica-se ao cultivo artesanal de café especial na icônica Serra da
-                Canastra. Nossa paixão pela terra e pelo grão perfeito nos levou a criar uma das marcas mais respeitadas
-                do café brasileiro.
+                Since 1985, the Canastra family has dedicated themselves to the artisanal cultivation of special coffee in the iconic Serra da
+                Canastra. Our passion for the land and the perfect grain led us to create one of the most respected coffee brands
+                in Brazil.
               </p>
               <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-                Cada xícara conta uma história de tradição, inovação e amor pela arte de fazer café. Do plantio à sua
-                mesa, cuidamos de cada detalhe para entregar uma experiência única e inesquecível.
+                Each cup tells a story of tradition, innovation, and love for the art of making coffee. From planting to your
+                table, we take care of every detail to deliver a unique and unforgettable experience.
               </p>
 
               <div className="space-y-4">
