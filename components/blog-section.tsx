@@ -54,10 +54,10 @@ export default function BlogSection() {
           className="text-center mb-12 lg:mb-16"
         >
           <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4">
-            Nosso <span className="text-amber-600">Blog</span>
+            Blog Canastra
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-            Descubra os segredos do café especial, dicas de preparo e histórias da Serra da Canastra
+            Dicas exclusivas, histórias autênticas e segredos do café mais desejado da Serra da Canastra.
           </p>
         </motion.div>
 

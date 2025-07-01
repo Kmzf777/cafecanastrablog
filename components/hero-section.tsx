@@ -4,7 +4,17 @@ import { motion } from "framer-motion"
 
 export default function HeroSection() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 to-orange-100">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Banner background */}
+      <img 
+        src="/banner-canastra.png" 
+        alt="Banner Café Canastra" 
+        className="absolute inset-0 w-full h-full object-cover z-0" 
+        style={{objectPosition: 'center'}}
+      />
+      {/* Overlay para contraste */}
+      <div className="absolute inset-0 bg-black/40 z-0" />
+
       {/* Background mountains */}
       <div className="absolute inset-0 flex items-end justify-center">
         <motion.div 
@@ -51,21 +61,21 @@ export default function HeroSection() {
       {/* Main content */}
       <div className="relative z-10 text-center px-4">
         <motion.h1
-          className="text-5xl md:text-7xl font-bold text-amber-800 mb-4"
+          className="text-3xl md:text-5xl lg:text-6xl font-bold text-amber-800 mb-6 max-w-4xl mx-auto leading-tight"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          O Café da Serra do Tempo
+          Da fazenda à torrefação, café especial direto da Serra da Canastra.
         </motion.h1>
         
         <motion.p
-          className="text-xl md:text-2xl text-amber-600 font-medium"
+          className="text-lg md:text-2xl text-amber-600 font-medium max-w-2xl mx-auto mb-2 md:mb-0"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
         >
-          Feito com calma. Bebido com alma.
+          Cultivamos, colhemos e torramos nossos próprios cafés especiais na Serra da Canastra. Aqui, cada xícara carrega a pureza do terroir mineiro — do pé à torra, sem intermediários.
         </motion.p>
       </div>
     </div>

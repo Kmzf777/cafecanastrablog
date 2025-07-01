@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   MessageCircle,
@@ -22,6 +22,10 @@ import {
   Instagram,
   Facebook,
   Youtube,
+  Mountain,
+  LocateFixed,
+  Coffee,
+  HeartHandshake,
 } from "lucide-react"
 import BlogSection from "@/components/blog-section"
 import BlogNotification from "@/components/blog-notification"
@@ -392,11 +396,11 @@ export default function CafeCanastraWebsite() {
       <section id="início" className="relative h-screen flex items-center justify-center overflow-hidden">
         <motion.div className="absolute inset-0" style={{ y: heroY }}>
           <img
-            src="/placeholder.svg?height=800&width=400&text=Serra+da+Canastra"
-            alt="Serra da Canastra"
+            src="/banner-cafecanastra.png"
+            alt="Banner Café Canastra"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/70" />
         </motion.div>
 
         <motion.div
@@ -407,10 +411,10 @@ export default function CafeCanastraWebsite() {
           transition={{ duration: 1, delay: 0.5 }}
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-4 sm:mb-6 leading-tight">
-            O Café da Serra do Tempo
+            O Café que Eterniza Momentos
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-2xl mx-auto font-light leading-relaxed">
-            Cultivado com tradição familiar desde 1985, cada grão carrega a essência pura da Serra da Canastra
+            Cultivado com alma mineira desde 1985, cada grão leva até você o sabor puro da Serra da Canastra.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
@@ -424,8 +428,8 @@ export default function CafeCanastraWebsite() {
             </Button>
             <Button
               size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-gray-900 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base"
+              className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-black px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base transition-colors duration-200"
+              style={{ boxShadow: 'none' }}
             >
               <Play className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Nossa História
@@ -440,6 +444,49 @@ export default function CafeCanastraWebsite() {
         >
           <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8" />
         </motion.div>
+      </section>
+
+      {/* Diferenciais Section */}
+      <section id="diferenciais" className="py-16 lg:py-24 bg-gradient-to-b from-amber-50 to-white">
+        <div className="w-full px-2 sm:px-4 lg:px-8 mx-auto">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4">O que faz do Café Canastra algo único?</h2>
+          </div>
+          <div className="w-full grid gap-6 grid-cols-2 lg:grid-cols-4">
+            {/* Card 1 */}
+            <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
+              <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
+                <Mountain className="w-8 h-8 text-amber-600" />
+              </div>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Origem Serra da Canastra</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">Só torramos cafés que nós mesmos cultivamos, colhemos e selecionamos. Sem intermediários, sem misturas.</p>
+            </div>
+            {/* Card 2 */}
+            <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
+              <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
+                <LocateFixed className="w-8 h-8 text-amber-600" />
+              </div>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Single Origin</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">Cada café vem de um lote único, refletindo as nuances do nosso terroir.</p>
+            </div>
+            {/* Card 3 */}
+            <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
+              <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
+                <Coffee className="w-8 h-8 text-amber-600" />
+              </div>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Da fazenda à torrefação</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">Controle absoluto da qualidade em todas as etapas.</p>
+            </div>
+            {/* Card 4 */}
+            <div className="bg-white rounded-2xl shadow-lg border border-amber-100 p-8 sm:p-8 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-amber-200 h-full">
+              <div className="bg-amber-100 rounded-full p-4 mb-4 flex items-center justify-center">
+                <HeartHandshake className="w-8 h-8 text-amber-600" />
+              </div>
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Respeito às pessoas e ao meio ambiente</h3>
+              <p className="text-gray-700 text-sm hidden sm:block">Valorizamos nossa comunidade local, nossos colaboradores e cultivamos práticas sustentáveis que protegem a Serra da Canastra.</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Blog Section */}
@@ -457,7 +504,7 @@ export default function CafeCanastraWebsite() {
               className="w-full order-2 lg:order-1"
             >
               <img
-                src="/placeholder.svg?height=400&width=600&text=Nossa+História"
+                src="/nossa-historia.png"
                 alt="Nossa História"
                 className="w-full h-auto rounded-lg shadow-lg"
               />
@@ -514,128 +561,6 @@ export default function CafeCanastraWebsite() {
               </div>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* Cafés Section */}
-      <section id="cafés" className="py-12 sm:py-16 lg:py-20">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div
-            className="text-center mb-12 sm:mb-16"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold mb-4 text-gray-800">Nossos Cafés</h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-              Cada blend é cuidadosamente selecionado para proporcionar uma experiência única de sabor e aroma
-            </p>
-          </motion.div>
-
-          {/* Product Sections */}
-          {Object.entries(products).map(([key, product], index) => (
-            <motion.div
-              key={key}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className={`mb-16 sm:mb-20 lg:mb-32 ${index % 2 === 1 ? "bg-gray-50 py-12 sm:py-16 lg:py-20 -mx-4 sm:-mx-6 px-4 sm:px-6" : ""}`}
-            >
-              <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  viewport={{ once: true }}
-                  className={`relative w-full ${index % 2 === 1 ? "order-2 lg:order-1" : "order-2"}`}
-                >
-                  <div
-                    className={`absolute inset-0 rounded-full ${getColorClass(
-                      key,
-                      "bg",
-                    )} blur-2xl sm:blur-3xl opacity-30 transform -translate-x-4 sm:-translate-x-10 -translate-y-4 sm:-translate-y-10 scale-125`}
-                  />
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-auto rounded-2xl shadow-xl relative z-10 max-w-md mx-auto lg:max-w-none"
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  viewport={{ once: true }}
-                  className={`w-full ${index % 2 === 1 ? "order-1 lg:order-2" : "order-1"}`}
-                >
-                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold mb-3 sm:mb-4 text-gray-800">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm sm:text-base lg:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-                    {product.description}
-                  </p>
-
-                  <div className="mb-6 sm:mb-8">
-                    <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-700">Disponível em:</h4>
-                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
-                      {Object.entries(product.variants).map(([variantKey, variant]) => (
-                        <button
-                          key={variantKey}
-                          onClick={() => {
-                            setSelectedProduct(key)
-                            setSelectedVariant(variantKey)
-                          }}
-                          className={`px-3 py-2 sm:px-4 sm:py-2 rounded-full transition-all text-xs sm:text-sm ${
-                            selectedProduct === key && selectedVariant === variantKey
-                              ? `${getColorClass(key, "light")} ${getColorClass(key, "text")}`
-                              : `bg-white border ${getColorClass(key, "border")} ${getColorClass(key, "hover")}`
-                          }`}
-                        >
-                          {variant.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {selectedProduct === key && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className={`p-4 sm:p-6 rounded-lg ${getColorClass(key, "bg")} mb-6 sm:mb-8`}
-                    >
-                      <div className="flex items-center space-x-3 sm:space-x-4">
-                        <img
-                          src={product.variants[selectedVariant].image || "/placeholder.svg"}
-                          alt={product.variants[selectedVariant].name}
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0"
-                        />
-                        <div>
-                          <h5 className="font-semibold text-gray-800 text-sm sm:text-base">
-                            {product.name} - {product.variants[selectedVariant].name}
-                          </h5>
-                          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                            {product.variants[selectedVariant].description}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  <Button
-                    className={`w-full sm:w-auto ${getColorClass(key, "button")} text-white text-sm sm:text-base`}
-                    onClick={() => scrollToSection("contato")}
-                  >
-                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    Solicitar Informações
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
-          ))}
         </div>
       </section>
 
