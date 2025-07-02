@@ -18,8 +18,8 @@ const http = require('http');
 
 // Configuração do agendamento
 const config = {
-  // URL da API de agendamento (ajuste conforme necessário)
-  apiUrl: process.env.SCHEDULED_POSTS_API_URL || 'http://localhost:3003/api/scheduled-posts',
+  // URL da API de agendamento (ajuste conforme necessário)     
+  apiUrl: process.env.SCHEDULED_POSTS_API_URL || 'http://localhost:3000/api/scheduled-posts',
   
   // Configuração padrão dos posts
   postConfig: {
@@ -194,20 +194,42 @@ async function checkApiStatus() {
   }
 }
 
+async function waitUntil(targetDate) {
+  const now = new Date();
+  const msToWait = targetDate - now;
+  if (msToWait > 0) {
+    log(`⏳ Aguardando até o horário sorteado: ${targetDate.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })} (${Math.round(msToWait / 1000)} segundos)`);
+    await new Promise(resolve => setTimeout(resolve, msToWait));
+  } else {
+    log(`⚠️ Horário sorteado já passou, executando imediatamente.`);
+  }
+}
+
 async function main() {
-  log(`🌅 Script de Agendamento Automático iniciado`);
+  log(`🌅 Script de Agendamento Automático iniciado (modo TESTE)`);
   log(`📅 Data/Hora: ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`);
-  
+
+  // SORTEIO DE HORÁRIO ENTRE 12:41 E 12:44
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const minMinute = 41;
+  const maxMinute = 44;
+  const randomMinute = Math.floor(Math.random() * (maxMinute - minMinute + 1)) + minMinute;
+  const scheduledTime = new Date(today.setHours(12, randomMinute, 0, 0));
+
+  log(`🎲 Horário sorteado para execução: ${scheduledTime.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`);
+  await waitUntil(scheduledTime);
+
   // Verificar se a API está disponível
   const apiStatus = await checkApiStatus();
   if (!apiStatus) {
     log(`💥 API não está disponível. Encerrando.`, 'ERROR');
     process.exit(1);
   }
-  
+
   // Executar agendamento
   const result = await executeScheduledPosts();
-  
+
   if (result.success) {
     log(`🎉 Agendamento concluído com sucesso!`);
     process.exit(0);
