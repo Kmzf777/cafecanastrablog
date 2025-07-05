@@ -18,7 +18,7 @@ const products = [
     image: "/cafe-classico.png",
     imageAlt: "Foto do Canastra Clássico",
     gradient: "radial-gradient(circle at 60% 55%, #232526 0%, #414345 100%)",
-    textColor: "text-white",
+    textColor: "text-white/90",
     properties: [4, 3, 5, 5],
     propertyLabels: ["Doçura", "Acidez", "Corpo", "Amargor"],
     propertyStar: "text-yellow-400",
@@ -65,7 +65,7 @@ const products = [
   },
 ];
 
-export default function ProductCarousel() {
+export default function ProductCarousel({ scrollToSection }: { scrollToSection?: (id: string) => void }) {
   useEffect(() => {
     // Customizar botões do Swiper para minimalismo
     const style = document.createElement('style');
@@ -181,7 +181,8 @@ export default function ProductCarousel() {
                       fontFamily: 'Inter, sans-serif',
                       fontSize: 'clamp(1rem, 2.5vw, 1.35rem)',
                       marginBottom: 'clamp(1.2rem, 3vw, 2rem)',
-                      color: product.name === 'Canastra Clássico' ? 'rgba(255,255,255,0.8)' : 'inherit',
+                      color: product.name === 'Canastra Clássico' ? 'rgba(255,255,255,0.9)' : 
+                             product.name === 'Canastra Canela' ? 'rgba(255,255,255,0.9)' : undefined,
                       lineHeight: 1.4,
                     }}
                   >
@@ -195,6 +196,7 @@ export default function ProductCarousel() {
                       minWidth: 'min(80vw, 220px)',
                       boxShadow: '0 2px 16px 0 rgba(0,0,0,0.10)',
                     }}
+                    onClick={scrollToSection ? () => scrollToSection('contato') : undefined}
                   >
                     Comprar
                   </Button>

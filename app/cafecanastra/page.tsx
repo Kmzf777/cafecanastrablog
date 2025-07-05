@@ -27,10 +27,10 @@ import {
   Coffee,
   HeartHandshake,
 } from "lucide-react"
-import BlogSection from "@/components/blog-section"
 import BlogNotification from "@/components/blog-notification"
 import ProductCarousel from "@/components/product-carousel"
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import BlogSection from "@/components/blog-section"
 
 export default function CafeCanastraWebsite() {
   const [isMenuScrolled, setIsMenuScrolled] = useState(false)
@@ -223,23 +223,23 @@ export default function CafeCanastraWebsite() {
 
   const faqs = [
     {
-      question: "Como posso adquirir os cafés Canastra?",
+      question: "Entre em contato",
       answer:
-        "Entre em contato conosco pelo WhatsApp ou formulário de contato. Nossa equipe responderá em até 30 minutos durante o horário comercial para processar seu pedido.",
+        "Entre em contato conosco pelo WhatsApp ou formulário de contato. Nossa equipe responderá imediatamente para processar seu pedido.",
     },
     {
-      question: "Qual o prazo de entrega?",
-      answer: "Realizamos entregas em todo o Brasil. O prazo varia de 2 a 7 dias úteis, dependendo da sua localização.",
+      question: "Realizamos entregas em todo o Brasil.",
+      answer: "O prazo varia de um a 10 dias úteis para região Sul Sudeste Centro-Oeste e até 20 dias para região Norte e Nordeste.",
     },
     {
       question: "Qual a origem dos grãos?",
       answer:
-        "Todos os nossos cafés são cultivados na Serra da Canastra, em Minas Gerais, por produtores parceiros selecionados.",
+        "Todos os nossos cafés são cultivados na Serra da Canastra, em Minas Gerais em nossa própria fazenda.",
     },
     {
       question: "Como preparar o café perfeito?",
       answer:
-        "Cada embalagem vem com instruções específicas. Recomendamos água filtrada a 92-96°C e proporção 1:15 (café:água).",
+        "Cada embalagem vem com instruções específicas. Recomendamos água filtrada a 92-96°C e proporcao 1:12 (40g para 480ml agua)",
     },
   ]
 
@@ -495,10 +495,10 @@ export default function CafeCanastraWebsite() {
       </section>
 
       {/* Blog Section */}
-      <BlogSection />
+      {/* <BlogSection /> (REMOVER DAQUI) */}
 
       {/* Carrossel de Produtos */}
-      <ProductCarousel />
+      <ProductCarousel scrollToSection={scrollToSection} />
 
       {/* Nossa História */}
       <section id="nossa-historia" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
@@ -572,62 +572,6 @@ export default function CafeCanastraWebsite() {
         </div>
       </section>
 
-      {/* Kits Section */}
-      <section id="kits" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gray-50">
-        <div className="w-full max-w-7xl mx-auto">
-          <motion.div
-            className="text-center mb-8 sm:mb-12"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold mb-4 text-gray-800">
-              Presentes & Kits
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-              Presenteie quem você ama com a experiência única do café Canastra
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {giftKits.map((kit, index) => (
-              <motion.div
-                key={kit.name}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                whileHover={{ scale: 1.02 }}
-                className="group w-full"
-              >
-                <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 h-full">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={kit.image || "/placeholder.svg"}
-                      alt={kit.name}
-                      className="w-full h-48 sm:h-56 lg:h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                  </div>
-                  <CardContent className="p-4 sm:p-6">
-                    <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-800">{kit.name}</h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">{kit.description}</p>
-                    <Button 
-                      className="w-full bg-amber-600 hover:bg-amber-700 text-white text-sm sm:text-base"
-                      onClick={() => scrollToSection("contato")}
-                    >
-                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                      Solicitar Informações
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Galeria Sensorial */}
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-white">
         <div className="w-full max-w-7xl mx-auto">
@@ -648,17 +592,17 @@ export default function CafeCanastraWebsite() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             {[
-              "Plantio+Artesanal",
-              "Colheita+Manual",
-              "Secagem+Solar",
-              "Torra+Artesanal",
-              "Moagem+Fresca",
-              "Preparo+Perfeito",
-              "Degustação",
-              "Experiência+Única",
+              { src: "/plantio-artesanal-low.png", label: "Plantio Artesanal" },
+              { src: "/colheita-manual-low.png", label: "Colheita Manual" },
+              { src: "/secagem-solar-low.png", label: "Secagem Solar" },
+              { src: "/torra-artesanal-low.png", label: "Torra Artesanal" },
+              { src: "/moagem-fresca-low.png", label: "Moagem Fresca" },
+              { src: "/preparo-perfeito-low.png", label: "Preparo Perfeito" },
+              { src: "/degustacao-low.png", label: "Degustação" },
+              { src: "/experiencia-unica-low.png", label: "Experiência Única" },
             ].map((item, index) => (
               <motion.div
-                key={item}
+                key={item.label}
                 initial={{ opacity: 0, scale: 0.8 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -666,14 +610,14 @@ export default function CafeCanastraWebsite() {
                 className="group relative overflow-hidden rounded-lg"
               >
                 <img
-                  src={`/placeholder.svg?height=200&width=200&text=${item}`}
-                  alt={item.replace("+", " ")}
+                  src={item.src}
+                  alt={item.label}
                   className="w-full h-32 sm:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span className="text-white font-semibold text-xs sm:text-sm lg:text-base text-center px-2">
-                    {item.replace("+", " ")}
+                    {item.label}
                   </span>
                 </div>
               </motion.div>
@@ -710,11 +654,6 @@ export default function CafeCanastraWebsite() {
                   <div key={index} className="w-full flex-shrink-0 px-2 sm:px-4">
                     <Card className="bg-white shadow-lg">
                       <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
-                        <img
-                          src={testimonial.avatar || "/placeholder.svg"}
-                          alt={testimonial.name}
-                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto mb-4 sm:mb-6 object-cover"
-                        />
                         <blockquote className="text-sm sm:text-lg lg:text-xl text-gray-700 mb-4 sm:mb-6 italic leading-relaxed">
                           "{testimonial.text}"
                         </blockquote>
@@ -756,6 +695,7 @@ export default function CafeCanastraWebsite() {
       </section>
 
       {/* FAQ Section */}
+      <BlogSection />
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gray-50">
         <div className="w-full max-w-3xl mx-auto">
           <motion.div
@@ -886,83 +826,6 @@ export default function CafeCanastraWebsite() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 sm:py-12 px-4 sm:px-6">
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
-            <div className="sm:col-span-2 lg:col-span-1">
-              <img
-                src="/logo-canastra.png"
-                alt="Café Canastra"
-                className="h-10 sm:h-12 w-auto filter brightness-0 invert mb-4"
-              />
-              <p className="text-gray-300 mb-4 text-sm sm:text-base leading-relaxed">
-                O melhor café artesanal da Serra da Canastra, cultivado com tradição e paixão desde 1985.
-              </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Instagram className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Facebook className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Youtube className="w-5 h-5 sm:w-6 sm:h-6" />
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Links Úteis</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
-                    Política de Privacidade
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
-                    Termos de Uso
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
-                    Trocas e Devoluções
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">
-                    Frete e Entrega
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Newsletter</h4>
-              <p className="text-gray-300 mb-4 text-sm sm:text-base">Receba novidades e ofertas exclusivas</p>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Input
-                  type="email"
-                  placeholder="Seu e-mail"
-                  className="flex-1 bg-gray-800 border-gray-700 text-white text-sm sm:text-base"
-                />
-                <Button className="bg-amber-600 hover:bg-amber-700 text-sm sm:text-base">Assinar</Button>
-              </div>
-              <div className="mt-4 sm:mt-6 text-xs sm:text-sm text-gray-400">
-                <p>Café Canastra Ltda.</p>
-                <p>CNPJ: 12.345.678/0001-90</p>
-                <p>Serra da Canastra, MG</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-800 pt-6 sm:pt-8 text-center text-gray-400">
-            <p className="text-xs sm:text-sm">&copy; 2024 Café Canastra. Todos os direitos reservados.</p>
-          </div>
-        </div>
-      </footer>
 
       {/* Floating WhatsApp Button */}
       <motion.div

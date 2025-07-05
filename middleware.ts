@@ -18,6 +18,8 @@ const PUBLIC_ROUTES = [
   '/api/auth/logout',
   '/api/scheduled-posts',
   '/cafecanastra',
+  '/en/cafecanastra',
+  '/es/cafecanastra',
   '/blog',
   '/',
   '/sitemap.xml',

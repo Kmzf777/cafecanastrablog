@@ -79,14 +79,6 @@ export default function BlogManagerPage() {
   // Usar o hook de configuração automática com persistência
   const { config: autoConfig, isLoading: isConfigLoading, isSaving: isConfigSaving, updateConfig } = useAutoConfig()
   
-  const [scheduledStatus, setScheduledStatus] = useState<{
-    isWithinAllowedTime: boolean
-    currentTime: string
-    allowedTime: string
-    status: string
-  } | null>(null)
-  const [isCheckingSchedule, setIsCheckingSchedule] = useState(false)
-
   // Estado para a aba de Postagem Personalizada
   const [tema, setTema] = useState("")
   const [publicoAlvo, setPublicoAlvo] = useState("")
@@ -100,52 +92,6 @@ export default function BlogManagerPage() {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false)
 
   const { toast } = useToast()
-
-  // Defina a função ANTES dos useEffect
-  const checkScheduledStatus = useCallback(async () => {
-    setIsCheckingSchedule(true)
-    try {
-      const response = await fetch('/api/scheduled-posts', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setScheduledStatus({
-          isWithinAllowedTime: data.isWithinAllowedTime,
-          currentTime: data.currentTime,
-          allowedTime: data.allowedTime,
-          status: data.status
-        })
-      } else {
-        throw new Error('Falha ao verificar status do agendamento')
-      }
-    } catch (error) {
-      console.error('Erro ao verificar status do agendamento:', error)
-      toast({
-        title: "Erro",
-        description: "Falha ao verificar status do agendamento automático.",
-        variant: "destructive",
-        duration: 5000,
-      })
-    } finally {
-      setIsCheckingSchedule(false)
-    }
-  }, [toast])
-
-  // Agora os useEffect podem usar checkScheduledStatus normalmente
-  useEffect(() => {
-    if (activeTab === "gerenciamento" && isAuthorized && !isCheckingSchedule) {
-      checkScheduledStatus()
-    }
-  }, [activeTab, isAuthorized, checkScheduledStatus, isCheckingSchedule])
-
-  useEffect(() => {
-    if (isAuthorized && !isCheckingSchedule && !scheduledStatus) {
-      checkScheduledStatus()
-    }
-  }, [isAuthorized, checkScheduledStatus, isCheckingSchedule, scheduledStatus])
 
   useEffect(() => {
     // Verificar autenticação via API
@@ -521,8 +467,6 @@ export default function BlogManagerPage() {
           duration: 5000,
         })
         
-        // Atualizar status e carregar posts
-        await checkScheduledStatus()
         setTimeout(() => loadPostsFromSupabase(), 1000)
       } else {
         throw new Error(data.error || 'Falha na execução do agendamento')
@@ -808,75 +752,6 @@ export default function BlogManagerPage() {
               {/* Aba 1: Postagem Automática e Agendamento */}
               <TabsContent value="automatico">
                 <div className="space-y-6">
-                  {/* Status do Agendamento */}
-                  <Card className="border-gray-200 shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between text-gray-800">
-                        <span>Status do Agendamento</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={checkScheduledStatus}
-                          disabled={isCheckingSchedule}
-                          className="border-amber-500 text-amber-600 hover:bg-amber-50"
-                        >
-                          {isCheckingSchedule ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <RefreshCw className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {isCheckingSchedule ? (
-                        <div className="text-center py-8">
-                          <Loader2 className="h-8 w-8 animate-spin text-amber-600 mx-auto mb-4" />
-                          <p className="text-gray-600">Verificando status do agendamento...</p>
-                        </div>
-                      ) : scheduledStatus ? (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="text-sm font-medium text-gray-700">Horário Atual:</span>
-                            <span className="text-sm text-gray-900">{scheduledStatus.currentTime}</span>
-                          </div>
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="text-sm font-medium text-gray-700">Horário Permitido:</span>
-                            <span className="text-sm text-gray-900">{scheduledStatus.allowedTime}</span>
-                          </div>
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="text-sm font-medium text-gray-700">Status:</span>
-                            <div className="flex items-center space-x-2">
-                              {scheduledStatus.isWithinAllowedTime ? (
-                                <>
-                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                  <span className="text-sm text-green-600 font-medium">Dentro do Horário</span>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                  <span className="text-sm text-red-600 font-medium">Fora do Horário</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          {!scheduledStatus.isWithinAllowedTime && (
-                            <Alert className="border-amber-200 bg-amber-50">
-                              <AlertTriangle className="h-4 w-4 text-amber-600" />
-                              <AlertDescription className="text-amber-800">
-                                O agendamento automático só funciona entre {autoConfig.startHour}h e {autoConfig.endHour}h da manhã.
-                              </AlertDescription>
-                            </Alert>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8">
-                          <p className="text-gray-600">Clique em "Atualizar" para verificar o status do agendamento.</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-
                   {/* Configuração do Agendamento */}
                   <Card className="border-gray-200 shadow-sm">
                     <CardHeader>
@@ -913,101 +788,11 @@ export default function BlogManagerPage() {
                           }
                         </p>
                       </div>
-
-                      {/* Configuração de Horários */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="startHour" className="text-gray-700">
-                            Horário de Início
-                          </Label>
-                          <Input
-                            id="startHour"
-                            type="number"
-                            min={0}
-                            max={23}
-                            value={autoConfig.startHour}
-                            onChange={(e) => updateConfig({ startHour: Number.parseInt(e.target.value) || 7 })}
-                            className="border-gray-300"
-                            disabled={!autoConfig.isEnabled}
-                          />
-                          <p className="text-xs text-gray-500">Hora do início (0-23)</p>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="endHour" className="text-gray-700">
-                            Horário de Fim
-                          </Label>
-                          <Input
-                            id="endHour"
-                            type="number"
-                            min={0}
-                            max={23}
-                            value={autoConfig.endHour}
-                            onChange={(e) => updateConfig({ endHour: Number.parseInt(e.target.value) || 10 })}
-                            className="border-gray-300"
-                            disabled={!autoConfig.isEnabled}
-                          />
-                          <p className="text-xs text-gray-500">Hora do fim (0-23)</p>
-                        </div>
-                      </div>
-
-                      {/* Modo de Postagem */}
-                      <div className="space-y-2">
-                        <Label htmlFor="modoAgendamento" className="text-gray-700">
-                          Modo de Postagem
-                        </Label>
-                        <Select
-                          value={autoConfig.modo}
-                          onValueChange={(value) => updateConfig({ modo: value as "automático" | "personalizado" })}
-                          disabled={!autoConfig.isEnabled}
-                        >
-                          <SelectTrigger className="border-gray-300">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="automático">Automático</SelectItem>
-                            <SelectItem value="personalizado">Personalizado</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      {/* Campos para modo personalizado */}
-                      {autoConfig.modo === "personalizado" && (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="temaAgendamento" className="text-gray-700">
-                              Tema
-                            </Label>
-                            <Input
-                              id="temaAgendamento"
-                              placeholder="Ex: Café especial da Serra da Canastra"
-                              value={autoConfig.tema}
-                              onChange={(e) => updateConfig({ tema: e.target.value })}
-                              className="border-gray-300"
-                              disabled={!autoConfig.isEnabled}
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="publicoAgendamento" className="text-gray-700">
-                              Público-Alvo
-                            </Label>
-                            <Input
-                              id="publicoAgendamento"
-                              placeholder="Ex: Apreciadores de café gourmet"
-                              value={autoConfig.publico_alvo}
-                              onChange={(e) => updateConfig({ publico_alvo: e.target.value })}
-                              className="border-gray-300"
-                              disabled={!autoConfig.isEnabled}
-                            />
-                          </div>
-                        </>
-                      )}
                     </CardContent>
                     <CardFooter>
                       <Button
                         onClick={executeScheduledPosts}
-                        disabled={isLoading || supabaseStatus !== "connected" || !autoConfig.isEnabled || !scheduledStatus?.isWithinAllowedTime}
+                        disabled={isLoading || supabaseStatus !== "connected" || !autoConfig.isEnabled}
                         className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                       >
                         {isLoading ? (
