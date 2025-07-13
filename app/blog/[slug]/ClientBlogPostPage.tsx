@@ -19,6 +19,8 @@ interface ClientBlogPostPageProps {
 }
 
 export default function ClientBlogPostPage({ post, relatedPosts = [], category }: ClientBlogPostPageProps) {
+  // DEBUG: Verificar valor da imagem de capa
+  console.log('DEBUG imagem_titulo:', post.imagem_titulo)
   const readingTime = calculateReadingTime(post)
 
   // Gerar seções para a tabela de conteúdo
@@ -326,7 +328,7 @@ export default function ClientBlogPostPage({ post, relatedPosts = [], category }
             />
 
             {/* Hero Image */}
-            {post.imagem_titulo && (
+            {(post.imagem_titulo && post.imagem_titulo.trim() !== "") ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -338,7 +340,23 @@ export default function ClientBlogPostPage({ post, relatedPosts = [], category }
                   alt={post.alt_imagem_titulo || post.titulo}
                   caption={post.alt_imagem_titulo}
                   priority={true}
-                  className="w-full h-48 sm:h-64 lg:h-80 xl:h-96 object-cover rounded-xl shadow-lg"
+                  className="w-full h-auto max-w-full rounded-xl shadow-lg"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 66vw"
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="mb-6 lg:mb-8"
+              >
+                <OptimizedImage
+                  src="/placeholder.svg"
+                  alt="Imagem não disponível"
+                  caption="Imagem não disponível"
+                  priority={true}
+                  className="w-full h-auto max-w-full rounded-xl shadow-lg"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 66vw"
                 />
               </motion.div>
