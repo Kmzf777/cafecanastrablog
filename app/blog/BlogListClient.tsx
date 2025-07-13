@@ -11,16 +11,30 @@ import { motion } from "framer-motion"
 import { getPublishedPosts, type BlogPost } from "@/lib/supabase"
 import { calculateReadingTime } from "@/lib/utils"
 
-export default function BlogListClient() {
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+interface BlogListClientProps {
+  initialPosts?: BlogPost[]
+  category?: string
+  categoryTitle?: string
+  categoryDescription?: string
+}
+
+export default function BlogListClient({ 
+  initialPosts = [], 
+  category,
+  categoryTitle = "Blog",
+  categoryDescription = "Descubra os segredos do café especial, dicas de preparo e histórias da Serra da Canastra"
+}: BlogListClientProps) {
+  const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(initialPosts)
+  const [isLoading, setIsLoading] = useState(initialPosts.length === 0)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("newest")
 
   useEffect(() => {
-    loadPosts()
-  }, [])
+    if (initialPosts.length === 0) {
+      loadPosts()
+    }
+  }, [initialPosts.length])
 
   useEffect(() => {
     filterAndSortPosts()
@@ -126,18 +140,61 @@ export default function BlogListClient() {
           className="text-center mb-8 lg:mb-12"
         >
           <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4">
-            Nosso <span className="text-amber-600">Blog</span>
+            {categoryTitle === "Blog" ? (
+              <>Nosso <span className="text-amber-600">Blog</span></>
+            ) : (
+              <>{categoryTitle}</>
+            )}
           </h1>
           <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-            Descubra os segredos do café especial, dicas de preparo e histórias da Serra da Canastra
+            {categoryDescription}
           </p>
         </motion.div>
+
+        {/* Category Navigation - Only show on main blog page */}
+        {!category && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8 lg:mb-12"
+          >
+            <div className="flex flex-col sm:flex-row gap-4 max-w-4xl mx-auto">
+              <div className="flex-1 flex gap-4">
+                <Link href="/blog">
+                  <Button
+                    variant="default"
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    Todos os Posts
+                  </Button>
+                </Link>
+                <Link href="/blog/receitas">
+                  <Button
+                    variant="outline"
+                    className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                  >
+                    Receitas
+                  </Button>
+                </Link>
+                <Link href="/blog/noticias">
+                  <Button
+                    variant="outline"
+                    className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                  >
+                    Notícias
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Search and Filter */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: category ? 0.1 : 0.2 }}
           className="mb-8 lg:mb-12"
         >
           <div className="flex flex-col sm:flex-row gap-4 max-w-4xl mx-auto">
@@ -255,7 +312,17 @@ export default function BlogListClient() {
                     )}
 
                     {/* Read More Button */}
-                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="mt-auto">
+                    <a 
+                      href={post.post_type === "recipe" 
+                        ? `/blog/receitas/${post.slug}` 
+                        : post.post_type === "news" 
+                        ? `/blog/noticias/${post.slug}` 
+                        : `/blog/${post.slug}`
+                      } 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="mt-auto"
+                    >
                       <Button
                         variant="outline"
                         className="w-full border-amber-500 text-amber-600 hover:bg-amber-50 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 bg-transparent"

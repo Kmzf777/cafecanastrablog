@@ -142,7 +142,17 @@ export default function BlogSection() {
                     )}
 
                     {/* Read More Button */}
-                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="mt-auto">
+                    <a 
+                      href={post.post_type === "recipe" 
+                        ? `/blog/receitas/${post.slug}` 
+                        : post.post_type === "news" 
+                        ? `/blog/noticias/${post.slug}` 
+                        : `/blog/${post.slug}`
+                      } 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="mt-auto"
+                    >
                       <Button
                         variant="outline"
                         className="w-full border-amber-500 text-amber-600 hover:bg-amber-50 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 bg-transparent"

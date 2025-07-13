@@ -49,6 +49,7 @@ import {
   testSupabaseConnection,
   type BlogPost,
   debugEnvironmentVariables,
+  uploadImageToStorage,
 } from "@/lib/supabase"
 import SupabaseStatus from "@/components/supabase-status"
 import {
@@ -65,13 +66,13 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { useAutoConfig } from "@/hooks/use-auto-config"
+import { supabase } from "@/lib/supabase"
 
 export default function BlogManagerPage() {
   console.log("[DEBUG] BlogManagerPage renderizou");
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("automatico")
-  const [isAuthorized, setIsAuthorized] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [isSupabaseAuthenticated, setIsSupabaseAuthenticated] = useState<boolean | null>(null)
 
   // Estado para verificação do Supabase
   const [supabaseStatus, setSupabaseStatus] = useState<"checking" | "connected" | "error">("checking")
@@ -90,57 +91,72 @@ export default function BlogManagerPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editedPost, setEditedPost] = useState<BlogPost | null>(null)
   const [isLoadingPosts, setIsLoadingPosts] = useState(false)
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
 
   const { toast } = useToast()
 
   useEffect(() => {
     // Verificar autenticação via API
-    checkAuthStatus()
+    // checkAuthStatus() // Removido
+  }, [])
+
+  // Checar autenticação do Supabase ao carregar o painel
+  useEffect(() => {
+    async function checkSupabaseAuth() {
+      const { data, error } = await supabase.auth.getUser()
+      if (data?.user) {
+        setIsSupabaseAuthenticated(true)
+      } else {
+        setIsSupabaseAuthenticated(false)
+      }
+    }
+    checkSupabaseAuth()
   }, [])
 
   // Verificar status do Supabase na inicialização
   useEffect(() => {
-    if (isAuthorized) {
+    if (isSupabaseAuthenticated === true) { // Removido isAuthorized
       checkSupabaseStatus()
     }
-  }, [isAuthorized])
+  }, [isSupabaseAuthenticated]) // Removido isAuthorized
 
   // Carregar posts do Supabase quando a aba de gerenciamento for ativada
   useEffect(() => {
-    if (isAuthorized && activeTab === "gerenciamento") {
+    if (isSupabaseAuthenticated === true && activeTab === "gerenciamento") { // Removido isAuthorized
       loadPostsFromSupabase()
     }
-  }, [isAuthorized, activeTab])
+  }, [isSupabaseAuthenticated, activeTab]) // Removido isAuthorized
 
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/auth/verify', {
-        method: 'GET',
-        credentials: 'include', // Incluir cookies
-      })
+  // Remover checkAuthStatus
+  // const checkAuthStatus = async () => {
+  //   try {
+  //     const response = await fetch('/api/auth/verify', {
+  //       method: 'GET',
+  //       credentials: 'include', // Incluir cookies
+  //     })
       
-      if (response.ok) {
-        setIsAuthorized(true)
-      } else {
-        setIsAuthorized(false)
-        // Redirecionar para login se não estiver autenticado
-        window.location.href = '/login'
-      }
-    } catch (error) {
-      console.error('Erro ao verificar autenticação:', error)
-      setIsAuthorized(false)
-      window.location.href = '/login'
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     if (response.ok) {
+  //       setIsAuthorized(true)
+  //     } else {
+  //       setIsAuthorized(false)
+  //       // Redirecionar para login se não estiver autenticado
+  //       window.location.href = '/login'
+  //     }
+  //   } catch (error) {
+  //     console.error('Erro ao verificar autenticação:', error)
+  //     setIsAuthorized(false)
+  //     window.location.href = '/login'
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   // Verificar status do Supabase na inicialização
   useEffect(() => {
-    if (isAuthorized) {
+    if (isSupabaseAuthenticated === true) { // Removido isAuthorized
       checkSupabaseStatus()
     }
-  }, [isAuthorized])
+  }, [isSupabaseAuthenticated]) // Removido isAuthorized
 
   const checkSupabaseStatus = async () => {
     try {
@@ -343,7 +359,14 @@ export default function BlogManagerPage() {
 
     setIsLoading(true)
     try {
-      const updatedPost = await updateBlogPost(editedPost.id, editedPost)
+      let imageUrl = editedPost.imagem_titulo
+      if (selectedImageFile) {
+        imageUrl = await uploadImageToStorage(selectedImageFile, editedPost.id)
+        if (imageUrl) {
+          setEditedPost({ ...editedPost, imagem_titulo: imageUrl })
+        }
+      }
+      const updatedPost = await updateBlogPost(editedPost.id, { ...editedPost, imagem_titulo: imageUrl })
 
       if (updatedPost) {
         const updatedPosts = posts.map((post) => {
@@ -361,6 +384,7 @@ export default function BlogManagerPage() {
           duration: 5000,
         })
         setIsEditModalOpen(false)
+        setSelectedImageFile(null)
       } else {
         throw new Error("Falha ao atualizar post")
       }
@@ -380,8 +404,8 @@ export default function BlogManagerPage() {
     if (!confirm("Tem certeza que deseja excluir este post?")) return
 
     try {
-      const { error } = await supabase.from("blog_posts").delete().eq("id", postId)
-      if (error) throw error
+      const success = await deleteBlogPost(postId)
+      if (!success) throw new Error("Falha ao excluir post")
 
       toast({
         title: "✅ Post excluído!",
@@ -400,8 +424,17 @@ export default function BlogManagerPage() {
     }
   }
 
-  const viewBlogPage = (slug: string) => {
-    window.open(`/blog/${slug}`, "_blank")
+  const viewBlogPage = (slug: string, postType?: string | null) => {
+    let url = `/blog/${slug}`
+    
+    // Redirecionar para a rota correta baseada no post_type
+    if (postType === "recipe") {
+      url = `/blog/receitas/${slug}`
+    } else if (postType === "news") {
+      url = `/blog/noticias/${slug}`
+    }
+    
+    window.open(url, "_blank")
   }
 
   const formatDate = (dateString: string) => {
@@ -509,39 +542,30 @@ export default function BlogManagerPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
-      console.log("=== LOGIN FORM SUBMITTED ===")
-      console.log("Username:", username)
-      console.log("Password:", password)
       setIsLoading(true)
       setLoginError("")
       try {
-        console.log("Fazendo requisição para /api/login...")
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+        // Login Supabase Auth
+        const { error } = await supabase.auth.signInWithPassword({
+          email: username, // agora username é o e-mail
+          password: password
         })
-        console.log("Resposta recebida:", res.status, res.statusText)
-        const data = await res.json()
-        console.log("Dados da resposta:", data)
-        if (data.success) {
-          console.log("Login bem-sucedido, chamando onLogin...")
+        if (error) {
+          setLoginError("Login no Supabase falhou: " + error.message)
           toast({
-            title: "Login realizado com sucesso!",
-            description: "Redirecionando para o painel...",
-          })
-          onLogin()
-        } else {
-          console.log("Login falhou:", data.error)
-          setLoginError(data.error || "Usuário ou senha inválidos")
-          toast({
-            title: "Erro no login",
-            description: data.error || "Usuário ou senha inválidos",
+            title: "Erro no login Supabase",
+            description: error.message,
             variant: "destructive",
           })
+          setIsLoading(false)
+          return
         }
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Redirecionando para o painel...",
+        })
+        onLogin()
       } catch (error) {
-        console.error("Erro na requisição:", error)
         setLoginError("Erro inesperado. Tente novamente.")
         toast({
           title: "Erro",
@@ -577,7 +601,7 @@ export default function BlogManagerPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="username" className="text-sm font-medium text-gray-700">
-                    Usuário
+                    E-mail
                   </Label>
                   <Input
                     id="username"
@@ -648,7 +672,8 @@ export default function BlogManagerPage() {
     )
   }
 
-  if (loading) {
+  // Remover if (loading)
+  if (isSupabaseAuthenticated === null) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
@@ -659,11 +684,14 @@ export default function BlogManagerPage() {
     )
   }
 
-  if (!isAuthorized) {
-    console.log("[DEBUG] Renderizando LoginForm porque não está autorizado");
-    return <LoginForm onLogin={() => window.location.reload()} />
+  if (isSupabaseAuthenticated === false) {
+    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+      window.location.href = '/login'
+    }
+    return null
   }
 
+  // Remover if (!isAuthorized) e LoginForm
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -983,7 +1011,7 @@ export default function BlogManagerPage() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => viewBlogPage(post.slug)}
+                                  onClick={() => viewBlogPage(post.slug, post.post_type)}
                                   className="border-green-500 text-green-600 hover:bg-green-50 flex-1"
                                 >
                                   <ExternalLink className="h-3 w-3 mr-1" /> Página
@@ -1068,7 +1096,7 @@ export default function BlogManagerPage() {
                   </Button>
                   {selectedPost && (
                     <Button
-                      onClick={() => viewBlogPage(selectedPost.slug)}
+                      onClick={() => viewBlogPage(selectedPost.slug, selectedPost.post_type)}
                       className="bg-amber-600 hover:bg-amber-700 text-white"
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
@@ -1122,6 +1150,27 @@ export default function BlogManagerPage() {
                       onChange={(e) => setEditedPost(editedPost ? { ...editedPost, resumo: e.target.value } : null)}
                       className="border-gray-300 resize-none"
                     />
+                  </div>
+
+                  {/* Campo de upload de imagem */}
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-imagem-titulo" className="text-gray-700">
+                      Imagem de Capa
+                    </Label>
+                    <input
+                      id="edit-imagem-titulo"
+                      type="file"
+                      accept="image/*"
+                      onChange={e => setSelectedImageFile(e.target.files?.[0] || null)}
+                      className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                    />
+                    {editedPost?.imagem_titulo && (
+                      <img
+                        src={editedPost.imagem_titulo}
+                        alt="Imagem atual do post"
+                        className="mt-2 max-h-40 rounded border"
+                      />
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

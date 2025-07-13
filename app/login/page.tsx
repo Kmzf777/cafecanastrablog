@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Loader2, Shield, Eye, EyeOff, Coffee } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { supabase } from "@/lib/supabase"
 
 export default function LoginPage() {
   console.log("LoginPage renderizando...")
@@ -23,10 +24,13 @@ export default function LoginPage() {
 
   const { toast } = useToast()
 
-  // Verificar se já está logado
+  // Verificar se já está logado (apenas Supabase Auth)
   useEffect(() => {
-    console.log("LoginPage useEffect executando...")
-    checkAuthStatus()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) {
+        window.location.href = '/blogmanager'
+      }
+    })
   }, [])
 
   // Verificar bloqueio por tentativas
@@ -51,30 +55,8 @@ export default function LoginPage() {
     }
   }, [loginAttempts])
 
-  const checkAuthStatus = async () => {
-    try {
-      console.log("Verificando status de autenticação...")
-      const response = await fetch('/api/auth/verify', {
-        method: 'GET',
-        credentials: 'include',
-      })
-      
-      if (response.ok) {
-        console.log("Usuário já autenticado, redirecionando...")
-        // Já está logado, redirecionar para o blog manager
-        window.location.href = '/blogmanager'
-      } else {
-        console.log("Usuário não autenticado")
-      }
-    } catch (error) {
-      console.error('Erro ao verificar autenticação:', error)
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Tentativa de login...")
-
     if (isBlocked) {
       toast({
         title: "Acesso bloqueado",
@@ -83,7 +65,6 @@ export default function LoginPage() {
       })
       return
     }
-
     if (!username.trim() || !password.trim()) {
       toast({
         title: "Campos obrigatórios",
@@ -92,50 +73,38 @@ export default function LoginPage() {
       })
       return
     }
-
     setIsLoading(true)
-
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
+      // Login Supabase Auth
+      const { error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
       })
-
-      const data = await response.json()
-      console.log("Resposta do login:", data)
-
-      if (data.success) {
-        toast({
-          title: "Login realizado com sucesso",
-          description: "Redirecionando para o painel administrativo...",
-        })
-        
-        // Limpar formulário
-        setUsername("")
-        setPassword("")
-        setLoginAttempts(0)
-        
-        // Redirecionar após um breve delay
-        setTimeout(() => {
-          window.location.href = "/blogmanager"
-        }, 1000)
-      } else {
+      if (error) {
         setLoginAttempts(prev => prev + 1)
         toast({
-          title: "Erro no login",
-          description: data.error || "Credenciais inválidas",
+          title: "Erro no login Supabase",
+          description: error.message,
           variant: "destructive",
         })
+        setIsLoading(false)
+        return
       }
+      toast({
+        title: "Login realizado com sucesso",
+        description: "Redirecionando para o painel administrativo...",
+      })
+      setUsername("")
+      setPassword("")
+      setLoginAttempts(0)
+      setTimeout(() => {
+        window.location.href = "/blogmanager"
+      }, 1000)
     } catch (error) {
-      console.error("Erro no login:", error)
       setLoginAttempts(prev => prev + 1)
       toast({
-        title: "Erro de conexão",
-        description: "Não foi possível conectar ao servidor",
+        title: "Erro inesperado",
+        description: "Tente novamente.",
         variant: "destructive",
       })
     } finally {

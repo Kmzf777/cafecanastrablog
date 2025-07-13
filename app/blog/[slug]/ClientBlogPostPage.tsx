@@ -14,10 +14,11 @@ import TableOfContents from "@/components/table-of-contents"
 
 interface ClientBlogPostPageProps {
   post: BlogPost
-  relatedPosts: BlogPost[]
+  relatedPosts?: BlogPost[]
+  category?: string
 }
 
-export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPostPageProps) {
+export default function ClientBlogPostPage({ post, relatedPosts = [], category }: ClientBlogPostPageProps) {
   const readingTime = calculateReadingTime(post)
 
   // Gerar seções para a tabela de conteúdo
@@ -107,6 +108,156 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
     )
   }
 
+  // Renderizar ingredientes para receitas
+  const renderIngredientes = () => {
+    if (post.post_type !== "recipe" || !post.ingredientes_titulo) return null
+
+    const ingredientes = []
+    for (let i = 1; i <= 15; i++) {
+      const ingrediente = post[`ingrediente_${i}` as keyof BlogPost] as string
+      if (ingrediente) {
+        ingredientes.push(ingrediente)
+      }
+    }
+
+    if (ingredientes.length === 0) return null
+
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="mb-8 lg:mb-12"
+      >
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 lg:mb-6 border-b-2 border-amber-500 pb-2">
+          {post.ingredientes_titulo}
+        </h2>
+        <div className="bg-amber-50 p-6 rounded-lg">
+          <ul className="space-y-2">
+            {ingredientes.map((ingrediente, index) => (
+              <li key={index} className="flex items-start">
+                <span className="text-amber-600 mr-2">•</span>
+                <span className="text-gray-700">{ingrediente}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </motion.section>
+    )
+  }
+
+  // Renderizar modo de preparo para receitas
+  const renderModoPreparo = () => {
+    if (post.post_type !== "recipe" || !post.modo_de_preparo_titulo) return null
+
+    const passos = []
+    for (let i = 1; i <= 15; i++) {
+      const passo = post[`modo_de_preparo_${i}` as keyof BlogPost] as string
+      if (passo) {
+        passos.push(passo)
+      }
+    }
+
+    if (passos.length === 0) return null
+
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="mb-8 lg:mb-12"
+      >
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 lg:mb-6 border-b-2 border-amber-500 pb-2">
+          {post.modo_de_preparo_titulo}
+        </h2>
+        <div className="space-y-4">
+          {passos.map((passo, index) => (
+            <div key={index} className="flex items-start">
+              <span className="bg-amber-600 text-white rounded-full w-8 h-8 aspect-square flex items-center justify-center text-sm font-bold mr-4 mt-1">
+                {index + 1}
+              </span>
+              <p className="text-gray-700 leading-relaxed">{passo}</p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+    )
+  }
+
+  // Renderizar subtítulos e parágrafos dinâmicos
+  const renderSubtitulosParagrafos = () => {
+    const sections = []
+    
+    for (let i = 1; i <= 10; i++) {
+      const subtitulo = post[`subtitulo_${i}` as keyof BlogPost] as string
+      const paragrafo = post[`paragrafo_${i}` as keyof BlogPost] as string
+      
+      if (subtitulo || paragrafo) {
+        sections.push({ subtitulo, paragrafo, index: i })
+      }
+    }
+
+    if (sections.length === 0) return null
+
+    return sections.map(({ subtitulo, paragrafo, index }) => (
+      <motion.section
+        key={index}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="mb-8 lg:mb-12"
+      >
+        {subtitulo && (
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 lg:mb-6 border-b-2 border-amber-500 pb-2">
+            {subtitulo}
+          </h2>
+        )}
+        {paragrafo && (
+          <div className="prose prose-sm sm:prose lg:prose-lg max-w-none text-gray-700 leading-relaxed">
+            {paragrafo.split("\n").map(
+              (paragraph, pIndex) =>
+                paragraph.trim() && (
+                  <p key={pIndex} className="mb-4">
+                    {paragraph}
+                  </p>
+                ),
+            )}
+          </div>
+        )}
+      </motion.section>
+    ))
+  }
+
+  // Renderizar fonte para notícias
+  const renderFonte = () => {
+    if (post.post_type !== "news" || !post.fonte) return null
+
+    return (
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="mb-8 lg:mb-12"
+      >
+        <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-amber-500">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Fonte:</h3>
+          <a 
+            href={post.fonte} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-amber-600 hover:text-amber-700 underline"
+          >
+            {post.fonte}
+          </a>
+        </div>
+      </motion.section>
+    )
+  }
+
   const sharePost = (platform: string) => {
     const url = window.location.href
     const title = post.titulo
@@ -168,7 +319,11 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
           {/* Article Content */}
           <article className="lg:col-span-3 blog-content" itemScope itemType="https://schema.org/Article">
             {/* Breadcrumb */}
-            <BlogBreadcrumb postTitle={post.titulo} postSlug={post.slug} />
+            <BlogBreadcrumb 
+              postTitle={post.titulo} 
+              postSlug={post.slug} 
+              category={category}
+            />
 
             {/* Hero Image */}
             {post.imagem_titulo && (
@@ -278,6 +433,12 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
 
             {/* Seções 1-7 */}
             {[1, 2, 3, 4, 5, 6, 7].map(renderSection)}
+
+            {/* Conteúdo dinâmico baseado no post_type */}
+            {renderIngredientes()}
+            {renderModoPreparo()}
+            {renderSubtitulosParagrafos()}
+            {renderFonte()}
 
             {/* Seção CTA */}
             {(post.secao_cta_titulo || post.secao_cta_texto) && (
@@ -413,7 +574,17 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
                     <h3 className="text-lg font-bold text-gray-900 mb-4">Posts Relacionados</h3>
                     <nav className="space-y-4" role="navigation" aria-label="Posts relacionados">
                       {relatedPosts.map((relatedPost) => (
-                        <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="block group">
+                        <Link 
+                          key={relatedPost.id} 
+                          href={
+                            relatedPost.post_type === "recipe"
+                              ? `/blog/receitas/${relatedPost.slug}`
+                              : relatedPost.post_type === "news"
+                              ? `/blog/noticias/${relatedPost.slug}`
+                              : `/blog/${relatedPost.slug}`
+                          }
+                          className="block group"
+                        >
                           <div className="flex space-x-3">
                             <div className="w-16 h-16 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                               <Coffee className="w-6 h-6 text-amber-600" />
@@ -474,47 +645,6 @@ export default function ClientBlogPostPage({ post, relatedPosts }: ClientBlogPos
           </aside>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 lg:py-12 mt-12 lg:mt-16" role="contentinfo">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <img src="/logo-canastra.png" alt="Café Canastra" className="h-12 mx-auto mb-4 filter brightness-0 invert" />
-          <p className="text-gray-300 mb-6">O melhor café artesanal da Serra da Canastra</p>
-          <nav className="flex flex-wrap justify-center gap-6 lg:gap-8 mb-8" role="navigation" aria-label="Links do rodapé">
-            <Link href="/cafecanastra" className="text-gray-300 hover:text-white transition-colors">
-              Início
-            </Link>
-            <Link href="/blog" className="text-gray-300 hover:text-white transition-colors">
-              Blog
-            </Link>
-            <a href="https://loja.cafecanastra.com" className="text-gray-300 hover:text-white transition-colors">
-              Loja
-            </a>
-            <a
-              href="https://www.instagram.com/cafecanastra"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Instagram
-            </a>
-          </nav>
-          <div className="pt-6 lg:pt-8 border-t border-gray-800 text-sm text-gray-400">
-            <p>&copy; 2024 Café Canastra. Todos os direitos reservados.</p>
-          </div>
-        </div>
-      </footer>
-
-      {/* Floating WhatsApp Button */}
-      <div className="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-50">
-        <Button 
-          size="lg" 
-          className="bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg p-3 lg:p-4"
-          aria-label="Contatar via WhatsApp"
-        >
-          <MessageCircle className="w-5 h-5 lg:w-6 lg:h-6" />
-        </Button>
-      </div>
     </div>
   )
 }

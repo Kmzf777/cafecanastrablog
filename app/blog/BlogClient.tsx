@@ -191,7 +191,13 @@ function BlogListClient({ initialPosts }: { initialPosts: BlogPost[] }) {
                       <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">{post.resumo}</p>
 
                       <div className="flex items-center justify-end">
-                        <Link href={`/blog/${post.slug}`}>
+                        <Link href={
+                          post.post_type === "recipe"
+                            ? `/blog/receitas/${post.slug}`
+                            : post.post_type === "news"
+                            ? `/blog/noticias/${post.slug}`
+                            : `/blog/${post.slug}`
+                        }>
                           <Button
                             variant="ghost"
                             size="sm"

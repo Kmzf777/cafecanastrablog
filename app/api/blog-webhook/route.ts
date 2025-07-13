@@ -57,6 +57,11 @@ export async function POST(request: NextRequest) {
     let createdPosts = 0
     for (const [index, postData] of postsToProcess.entries()) {
       try {
+        // Processar post_type se fornecido
+        if (postData.post_type) {
+          console.log(`Processando post com tipo: ${postData.post_type}`)
+        }
+        
         const savedPost = await saveBlogPost(postData, body.modo || "automático")
         if (savedPost) {
           savedPosts.push(savedPost)
@@ -66,6 +71,7 @@ export async function POST(request: NextRequest) {
             post: savedPost.titulo,
             slug: savedPost.slug,
             id: savedPost.id,
+            post_type: savedPost.post_type,
           })
         } else {
           results.push({

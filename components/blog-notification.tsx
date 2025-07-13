@@ -13,6 +13,7 @@ interface BlogPost {
   resumo: string
   slug: string
   data_criacao: string
+  post_type: "recipe" | "news"
 }
 
 export default function BlogNotification() {
@@ -69,7 +70,13 @@ export default function BlogNotification() {
               <p className="text-sm text-gray-600 mb-3 line-clamp-2">{newPost.resumo}</p>
 
               <div className="flex space-x-2">
-                <Link href={`/blog/${newPost.slug}`} className="flex-1">
+                <Link href={
+                  newPost.post_type === "recipe"
+                    ? `/blog/receitas/${newPost.slug}`
+                    : newPost.post_type === "news"
+                    ? `/blog/noticias/${newPost.slug}`
+                    : `/blog/${newPost.slug}`
+                } className="flex-1">
                   <Button size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white">
                     <ExternalLink className="w-4 h-4 mr-1" />
                     Ler agora

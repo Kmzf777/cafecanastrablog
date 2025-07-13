@@ -67,7 +67,11 @@ export default async function BlogPage() {
               "@type": "BlogPosting",
               headline: post.titulo,
               description: post.resumo || "Post do blog Café Canastra",
-              url: `https://cafecanastra.com/blog/${post.slug}`,
+              url: post.post_type === "recipe" 
+                ? `https://cafecanastra.com/blog/receitas/${post.slug}`
+                : post.post_type === "news"
+                ? `https://cafecanastra.com/blog/noticias/${post.slug}`
+                : `https://cafecanastra.com/blog/${post.slug}`,
               datePublished: post.created_at,
               dateModified: post.updated_at,
               author: {
@@ -79,7 +83,11 @@ export default async function BlogPage() {
         }}
       />
 
-      <BlogListClient initialPosts={posts} />
+      <BlogListClient 
+        initialPosts={posts} 
+        categoryTitle="Blog"
+        categoryDescription="Descubra os segredos do café especial, dicas de preparo e histórias da Serra da Canastra"
+      />
     </>
   )
 }

@@ -130,38 +130,7 @@ export async function middleware(request: NextRequest) {
     }
   }
   
-  // Verificar se é uma rota protegida
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route))
-  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || 
-                       pathname.startsWith('/blog/') || 
-                       pathname.startsWith('/api/auth/')
-  
-  if (isProtectedRoute) {
-    console.log(`[MIDDLEWARE] Rota protegida: ${pathname}`)
-    
-    // Verificar token JWT
-    const token = request.cookies.get('admin-token')?.value
-    
-    if (!token) {
-      console.log(`[MIDDLEWARE] Token não encontrado, redirecionando para login`)
-      // Redirecionar para login se não houver token
-      const loginUrl = new URL('/login', request.url)
-      return NextResponse.redirect(loginUrl)
-    }
-    
-    // Verificar se o token é válido
-    const isValidToken = await verifyToken(token)
-    if (!isValidToken) {
-      console.log(`[MIDDLEWARE] Token inválido, redirecionando para login`)
-      // Token inválido, redirecionar para login
-      const loginUrl = new URL('/login', request.url)
-      const response = NextResponse.redirect(loginUrl)
-      response.cookies.delete('admin-token')
-      return response
-    }
-    
-    console.log(`[MIDDLEWARE] Token válido, permitindo acesso`)
-  }
+  // Remover checagem de rota protegida baseada em JWT
   
   // Bloquear acesso direto a arquivos sensíveis
   if (pathname.includes('.env') || pathname.includes('package.json') || pathname.includes('node_modules')) {

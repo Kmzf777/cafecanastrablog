@@ -14,13 +14,26 @@ import {
 interface BlogBreadcrumbProps {
   postTitle: string
   postSlug: string
+  category?: string
 }
 
-export default function BlogBreadcrumb({ postTitle, postSlug }: BlogBreadcrumbProps) {
+export default function BlogBreadcrumb({ postTitle, postSlug, category }: BlogBreadcrumbProps) {
   const breadcrumbItems = [
     { name: "Início", href: "/cafecanastra" },
     { name: "Blog", href: "/blog" },
-    { name: postTitle, href: `/blog/${postSlug}`, current: true },
+    ...(category ? [
+      { 
+        name: category === "receitas" ? "Receitas" : "Notícias", 
+        href: `/blog/${category}` 
+      }
+    ] : []),
+    { 
+      name: postTitle, 
+      href: category 
+        ? `/blog/${category}/${postSlug}` 
+        : `/blog/${postSlug}`, 
+      current: true 
+    },
   ]
 
   // Schema estruturado para breadcrumb
