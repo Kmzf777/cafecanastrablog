@@ -417,9 +417,10 @@ export async function getRecentPostsClient(limit = 4): Promise<BlogPost[]> {
     console.log("Limit:", limit)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
+    // Buscar todos os campos relevantes para o cálculo correto do tempo de leitura
     const { data, error } = await supabase
       .from("blog_posts")
-      .select("id, titulo, slug, created_at, imagem_titulo, alt_imagem_titulo, resumo")
+      .select("*") // Buscar todos os campos
       .eq("status", "publicado")
       .order("created_at", { ascending: false })
       .limit(limit)

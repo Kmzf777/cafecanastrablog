@@ -7,10 +7,6 @@ Sitemap: https://cafecanastra.com/sitemap.xml
 # Crawl-delay
 Crawl-delay: 1
 
-# Disallow admin areas
+# Disallow apenas áreas administrativas e APIs
 Disallow: /blogmanager/
-Disallow: /api/
-
-# Allow important pages
-Allow: /blog/
-Allow: /cafecanastra/ 
+Disallow: /api/ 

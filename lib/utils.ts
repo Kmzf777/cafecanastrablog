@@ -134,3 +134,70 @@ export function generateBlogPostSchema(post: any, slug: string, readingTime?: nu
     ...(post.fonte ? { "sourceOrganization": post.fonte } : {}),
   }
 }
+
+/**
+ * Gera o objeto schema.org Recipe para posts de receita.
+ * @param post O objeto do post
+ */
+export function generateRecipeSchema(post: any) {
+  // Ingredientes: campos ingrediente_1 a ingrediente_15
+  const ingredientes = Array.from({ length: 15 }, (_, i) => post[`ingrediente_${i + 1}`]).filter(Boolean)
+  // Instruções: campos modo_de_preparo_1 a modo_de_preparo_15
+  const instrucoes = Array.from({ length: 15 }, (_, i) => post[`modo_de_preparo_${i + 1}`]).filter(Boolean)
+
+  return {
+    "@context": "https://schema.org/",
+    "@type": "Recipe",
+    "name": post.titulo,
+    "image": post.imagem_titulo ? [post.imagem_titulo] : undefined,
+    "author": {
+      "@type": "Organization",
+      "name": "Café Canastra"
+    },
+    "datePublished": post.created_at,
+    "description": post.resumo || post.meta_description || "Receita com café especial da Serra da Canastra.",
+    "prepTime": post.tempo_preparo ? `PT${post.tempo_preparo}M` : undefined,
+    "cookTime": post.tempo_cozimento ? `PT${post.tempo_cozimento}M` : undefined,
+    "totalTime": post.tempo_total ? `PT${post.tempo_total}M` : undefined,
+    "recipeYield": post.rendimento || undefined,
+    "recipeIngredient": ingredientes,
+    "recipeInstructions": instrucoes.map(instrucao => ({ "@type": "HowToStep", "text": instrucao })),
+    "keywords": post.meta_keywords || "café especial, receita, serra da canastra",
+    "url": `https://cafecanastra.com/blog/receitas/${post.slug}`,
+    "inLanguage": "pt-BR"
+  }
+}
+
+/**
+ * Gera o objeto schema.org NewsArticle para posts de notícia.
+ * @param post O objeto do post
+ */
+export function generateNewsArticleSchema(post: any) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": post.titulo,
+    "image": post.imagem_titulo ? [post.imagem_titulo] : undefined,
+    "datePublished": post.created_at,
+    "dateModified": post.updated_at || post.created_at,
+    "author": {
+      "@type": "Organization",
+      "name": "Café Canastra"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Café Canastra",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cafecanastra.com/logo-canastra.png"
+      }
+    },
+    "description": post.resumo || post.meta_description || "Notícia sobre café especial da Serra da Canastra.",
+    "articleBody": post.secao_1_texto || post.paragrafo_1 || undefined,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://cafecanastra.com/blog/noticias/${post.slug}`
+    },
+    "inLanguage": "pt-BR"
+  }
+}

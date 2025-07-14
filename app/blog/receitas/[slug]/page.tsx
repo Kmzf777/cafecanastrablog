@@ -3,6 +3,7 @@ import { getPostBySlug, getPublishedPosts } from "@/lib/supabase"
 import ClientBlogPostPage from "../../[slug]/ClientBlogPostPage"
 import { notFound } from "next/navigation"
 import { generateBlogPostSchema } from "@/lib/utils"
+import { generateRecipeSchema } from "@/lib/utils"
 
 interface Props {
   params: { slug: string }
@@ -75,7 +76,7 @@ export default async function ReceitaPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generateBlogPostSchema(post, post.slug, undefined, undefined, "receitas")),
+          __html: JSON.stringify(generateRecipeSchema(post)),
         }}
       />
       <ClientBlogPostPage post={post} category="receitas" />

@@ -43,7 +43,8 @@ export default function LanguageSwitcher() {
     else if (pathname.startsWith('/es/')) newPath = pathname.replace('/es', '');
     // Monta nova rota
     if (lng === 'pt') {
-      router.push(newPath);
+      // Sempre redireciona para a home principal
+      router.push('/');
     } else {
       router.push('/' + lng + newPath);
     }
