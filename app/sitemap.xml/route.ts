@@ -1,24 +1,30 @@
 import { NextResponse } from 'next/server'
 import { getPublishedPosts } from '@/lib/supabase'
 
+interface UrlEntry {
+  loc: string;
+  lastmod?: string;
+  changefreq: string;
+  priority: number;
+}
+
 export async function GET() {
   const baseUrl = 'https://cafecanastra.com'
-  let posts = []
+  let posts: any[] = []
   try {
     posts = await getPublishedPosts()
   } catch (e) {
-    // fallback para sitemap só com páginas estáticas
     posts = []
   }
 
-  const staticUrls = [
+  const staticUrls: UrlEntry[] = [
     { loc: baseUrl, changefreq: 'weekly', priority: 1.0 },
     { loc: `${baseUrl}/blog`, changefreq: 'daily', priority: 0.8 },
     { loc: `${baseUrl}/blog/receitas`, changefreq: 'weekly', priority: 0.7 },
     { loc: `${baseUrl}/blog/noticias`, changefreq: 'weekly', priority: 0.7 },
   ]
 
-  const dynamicUrls = posts.map((post) => {
+  const dynamicUrls: UrlEntry[] = posts.map((post) => {
     let loc = `${baseUrl}/blog/${post.slug}`
     if (post.post_type === 'recipe') loc = `${baseUrl}/blog/receitas/${post.slug}`
     if (post.post_type === 'news') loc = `${baseUrl}/blog/noticias/${post.slug}`
@@ -30,7 +36,7 @@ export async function GET() {
     }
   })
 
-  const urls = [...staticUrls, ...dynamicUrls]
+  const urls: UrlEntry[] = [...staticUrls, ...dynamicUrls]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map(
