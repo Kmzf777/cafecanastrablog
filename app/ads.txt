@@ -1,0 +1,6 @@
+# Ads.txt para Café Canastra
+# Este arquivo indica que não há anúncios de terceiros no site
+# Evita problemas de indexação relacionados a anúncios
+
+# Comentário: Site não utiliza anúncios de terceiros
+# Data: 2025-01-18 

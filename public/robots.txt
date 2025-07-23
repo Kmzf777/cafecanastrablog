@@ -1,12 +1,37 @@
+# Robots.txt para Café Canastra
+# Permitir todos os bots legítimos
+
 User-agent: *
 Allow: /
+
+# Googlebot específico
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bingbot específico
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Outros bots de busca
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# Bloquear apenas áreas administrativas e APIs
+Disallow: /blogmanager/
+Disallow: /api/
+Disallow: /login
+Disallow: /_next/
+Disallow: /admin/
 
 # Sitemap
 Sitemap: https://cafecanastra.com/sitemap.xml
 
-# Crawl-delay
-Crawl-delay: 1
-
-# Disallow apenas áreas administrativas e APIs
-Disallow: /blogmanager/
-Disallow: /api/ 
+# Informações adicionais
+# Host: https://cafecanastra.com

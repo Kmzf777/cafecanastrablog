@@ -41,6 +41,8 @@ export async function GET() {
     { loc: `${baseUrl}/blog`, changefreq: 'daily', priority: 0.8 },
     { loc: `${baseUrl}/blog/receitas`, changefreq: 'weekly', priority: 0.7 },
     { loc: `${baseUrl}/blog/noticias`, changefreq: 'weekly', priority: 0.7 },
+    { loc: `${baseUrl}/politica-privacidade`, changefreq: 'monthly', priority: 0.3 },
+    { loc: `${baseUrl}/termos-uso`, changefreq: 'monthly', priority: 0.3 },
   ]
 
   const dynamicUrls: UrlEntry[] = posts.map((post) => {
@@ -71,10 +73,9 @@ export async function GET() {
   
   return new NextResponse(xml, {
     headers: {
-      'Content-Type': 'application/xml',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+      'X-Robots-Tag': 'noindex',
     },
   })
 } 

@@ -23,9 +23,9 @@ export function validateSupabaseConfig() {
     throw new Error("NEXT_PUBLIC_SUPABASE_URL is not a valid URL.")
   }
 
-  // Validar se a key parece ser um JWT
-  if (!anonKey.startsWith("eyJ")) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY does not appear to be a valid JWT token.")
+  // Validar se a key tem pelo menos 100 caracteres (mais flexível que verificar JWT)
+  if (anonKey.length < 100) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY appears to be too short for a valid JWT token.")
   }
 
   return { url, anonKey }
@@ -42,6 +42,7 @@ export function debugEnvironmentVariables() {
   }
 
   if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.log("Key length:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.length)
     console.log("Key starts with:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.substring(0, 10) + "...")
   }
 
