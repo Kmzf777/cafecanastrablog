@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { saveBlogPost } from "@/lib/supabase"
+import { revalidatePath } from "next/cache"
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,6 +90,34 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Revalidar o sitemap e páginas do blog após criar posts
+    if (createdPosts > 0) {
+      console.log("🔄 Revalidando sitemap e páginas do blog...")
+      try {
+        // Revalidação local
+        revalidatePath('/sitemap.xml')
+        revalidatePath('/blog')
+        revalidatePath('/blog/receitas')
+        revalidatePath('/blog/noticias')
+        
+        // Chamar endpoint de revalidação para garantir
+        const revalidateResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/revalidate-sitemap`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+        
+        if (revalidateResponse.ok) {
+          console.log("✅ Revalidação via endpoint concluída")
+        } else {
+          console.log("⚠️ Revalidação via endpoint falhou, mas revalidação local foi feita")
+        }
+        
+        console.log("✅ Revalidação concluída")
+      } catch (revalidateError) {
+        console.error("❌ Erro na revalidação:", revalidateError)
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: `Webhook processado com sucesso. ${createdPosts} post(s) criado(s).`,
@@ -97,6 +126,7 @@ export async function POST(request: NextRequest) {
       savedPosts: savedPosts.length,
       modo: body.modo || "automático",
       processedAt: new Date().toISOString(),
+      revalidated: createdPosts > 0,
     })
   } catch (error) {
     console.error("Erro no webhook:", error)

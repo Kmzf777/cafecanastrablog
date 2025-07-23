@@ -26,15 +26,21 @@ export default function BlogListClient({
 }: BlogListClientProps) {
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(initialPosts)
-  const [isLoading, setIsLoading] = useState(initialPosts.length === 0)
+  const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("newest")
 
   useEffect(() => {
     if (initialPosts.length === 0) {
+      setIsLoading(true)
       loadPosts()
+    } else {
+      // Se posts foram passados como props, usar eles diretamente
+      setPosts(initialPosts)
+      setFilteredPosts(initialPosts)
+      setIsLoading(false)
     }
-  }, [initialPosts.length])
+  }, [initialPosts])
 
   useEffect(() => {
     filterAndSortPosts()
@@ -110,12 +116,12 @@ export default function BlogListClient({
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/cafecanastra" className="flex items-center" aria-label="Ir para página inicial">
+          <Link href="/" className="flex items-center" aria-label="Ir para página inicial">
             <img src="/logo-canastra.png" alt="Café Canastra" className="h-8 mr-3" />
             <span className="text-lg font-semibold text-gray-800">Blog</span>
           </Link>
           <nav className="flex items-center space-x-3" role="navigation" aria-label="Navegação principal">
-            <Link href="/cafecanastra">
+            <Link href="/">
               <Button
                 variant="outline"
                 size="sm"
@@ -151,15 +157,16 @@ export default function BlogListClient({
           </p>
         </motion.div>
 
-        {/* Category Navigation - Only show on main blog page */}
-        {!category && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-8 lg:mb-12"
-          >
-            <div className="flex flex-col sm:flex-row gap-4 max-w-4xl mx-auto">
+        {/* Category Navigation - Show on main blog page or back button on category pages */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-8 lg:mb-12"
+        >
+          <div className="flex flex-col sm:flex-row gap-4 max-w-4xl mx-auto">
+            {!category ? (
+              // Main blog page - show all category buttons
               <div className="flex-1 flex gap-4">
                 <Link href="/blog">
                   <Button
@@ -186,9 +193,41 @@ export default function BlogListClient({
                   </Button>
                 </Link>
               </div>
-            </div>
-          </motion.div>
-        )}
+            ) : (
+              // Category page - show back button
+              <div className="flex-1 flex gap-4">
+                <Link href="/blog">
+                  <Button
+                    variant="outline"
+                    className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                  >
+                    ← Voltar ao Blog
+                  </Button>
+                </Link>
+                {category === "receitas" && (
+                  <Link href="/blog/noticias">
+                    <Button
+                      variant="outline"
+                      className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                    >
+                      Ver Notícias
+                    </Button>
+                  </Link>
+                )}
+                {category === "noticias" && (
+                  <Link href="/blog/receitas">
+                    <Button
+                      variant="outline"
+                      className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                    >
+                      Ver Receitas
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
+        </motion.div>
 
         {/* Search and Filter */}
         <motion.div
@@ -312,15 +351,13 @@ export default function BlogListClient({
                     )}
 
                     {/* Read More Button */}
-                    <a 
+                    <Link 
                       href={post.post_type === "recipe" 
                         ? `/blog/receitas/${post.slug}` 
                         : post.post_type === "news" 
                         ? `/blog/noticias/${post.slug}` 
                         : `/blog/${post.slug}`
                       } 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
                       className="mt-auto"
                     >
                       <Button
@@ -330,7 +367,7 @@ export default function BlogListClient({
                         Ler mais
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                       </Button>
-                    </a>
+                    </Link>
                   </CardContent>
                 </Card>
               </motion.div>

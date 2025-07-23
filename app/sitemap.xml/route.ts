@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
-import { getPublishedPosts } from '@/lib/supabase'
+import { getPublishedPosts, testSupabaseConnection } from '@/lib/supabase'
+
+// Forçar revalidação a cada requisição
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 interface UrlEntry {
   loc: string;
@@ -9,11 +13,26 @@ interface UrlEntry {
 }
 
 export async function GET() {
+  console.log('=== GERANDO SITEMAP ===')
   const baseUrl = 'https://cafecanastra.com'
   let posts: any[] = []
+  
+  // Testar conexão com Supabase
+  console.log('Testando conexão com Supabase...')
+  const connectionOk = await testSupabaseConnection()
+  if (!connectionOk) {
+    console.error('❌ Erro na conexão com Supabase')
+    // Retornar sitemap básico mesmo com erro de conexão
+  } else {
+    console.log('✅ Conexão com Supabase OK')
+  }
+  
   try {
+    console.log('Buscando posts publicados...')
     posts = await getPublishedPosts()
+    console.log(`✅ ${posts.length} posts encontrados`)
   } catch (e) {
+    console.error('❌ Erro ao buscar posts:', e)
     posts = []
   }
 
@@ -37,6 +56,10 @@ export async function GET() {
   })
 
   const urls: UrlEntry[] = [...staticUrls, ...dynamicUrls]
+  
+  console.log(`📊 Total de URLs no sitemap: ${urls.length}`)
+  console.log(`- URLs estáticas: ${staticUrls.length}`)
+  console.log(`- URLs dinâmicas: ${dynamicUrls.length}`)
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map(
@@ -44,9 +67,14 @@ export async function GET() {
     )
     .join('\n')}\n</urlset>`
 
+  console.log('✅ Sitemap gerado com sucesso')
+  
   return new NextResponse(xml, {
     headers: {
       'Content-Type': 'application/xml',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
     },
   })
 } 

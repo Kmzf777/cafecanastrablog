@@ -336,6 +336,7 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
   try {
     console.log("=== BUSCANDO POSTS PUBLICADOS ===")
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+    console.log("Timestamp da consulta:", new Date().toISOString())
 
     const { data, error } = await supabaseServer
       .from("blog_posts")
@@ -349,9 +350,44 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
     }
 
     console.log(`✅ ${data?.length || 0} posts encontrados`)
+    
+    // Debug: mostrar detalhes dos posts encontrados
+    if (data && data.length > 0) {
+      console.log("Posts encontrados:")
+      data.forEach((post, index) => {
+        console.log(`${index + 1}. ${post.titulo} (${post.slug}) - Tipo: ${post.post_type} - Status: ${post.status}`)
+      })
+    }
+    
     return data || []
   } catch (error) {
     console.error("❌ Erro ao buscar posts:", error)
+    return []
+  }
+}
+
+// Função para buscar posts publicados por tipo (server-side)
+export async function getPublishedPostsByType(postType: "recipe" | "news"): Promise<BlogPost[]> {
+  try {
+    console.log(`=== BUSCANDO POSTS PUBLICADOS DO TIPO: ${postType} ===`)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabaseServer
+      .from("blog_posts")
+      .select("*")
+      .eq("status", "publicado")
+      .eq("post_type", postType)
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      console.error("❌ Erro ao buscar posts por tipo:", error)
+      return []
+    }
+
+    console.log(`✅ ${data?.length || 0} posts do tipo ${postType} encontrados`)
+    return data || []
+  } catch (error) {
+    console.error("❌ Erro ao buscar posts por tipo:", error)
     return []
   }
 }

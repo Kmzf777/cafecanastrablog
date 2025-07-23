@@ -283,7 +283,7 @@ export default function ClientBlogPostPage({ post, relatedPosts = [], category }
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/cafecanastra" className="flex items-center" aria-label="Ir para página inicial">
+          <Link href="/" className="flex items-center" aria-label="Ir para página inicial">
             <img src="/logo-canastra.png" alt="Café Canastra" className="h-8 mr-3" />
             <span className="text-lg font-semibold text-gray-800">Blog</span>
           </Link>
@@ -300,7 +300,7 @@ export default function ClientBlogPostPage({ post, relatedPosts = [], category }
                 <span className="sm:hidden">Posts</span>
               </Button>
             </Link>
-            <Link href="/cafecanastra">
+            <Link href="/">
               <Button
                 variant="outline"
                 size="sm"

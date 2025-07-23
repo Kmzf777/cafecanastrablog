@@ -19,7 +19,7 @@ interface BlogBreadcrumbProps {
 
 export default function BlogBreadcrumb({ postTitle, postSlug, category }: BlogBreadcrumbProps) {
   const breadcrumbItems = [
-    { name: "Início", href: "/cafecanastra" },
+    { name: "Início", href: "/" },
     { name: "Blog", href: "/blog" },
     ...(category ? [
       { 

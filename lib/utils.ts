@@ -71,7 +71,7 @@ export function generateBlogPostSchema(post: any, slug: string, readingTime?: nu
     : `https://cafecanastra.com/blog/${post.slug}`
 
   const breadcrumbs = [
-    { name: "Início", url: "https://cafecanastra.com/cafecanastra" },
+    { name: "Início", url: "https://cafecanastra.com" },
     { name: "Blog", url: "https://cafecanastra.com/blog" },
     ...(category ? [{ name: category === "receitas" ? "Receitas" : "Notícias", url: `https://cafecanastra.com/blog/${category}` }] : []),
     { name: post.titulo, url },

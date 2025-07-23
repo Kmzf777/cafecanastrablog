@@ -137,7 +137,7 @@ export async function middleware(request: NextRequest) {
     return new NextResponse('Not Found', { status: 404 })
   }
   
-  // Bloquear bots maliciosos
+  // Bloquear bots maliciosos (exceto para sitemap e robots.txt)
   const userAgent = request.headers.get('user-agent') || ''
   const maliciousBots = [
     'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 'python', 'php'
@@ -145,7 +145,9 @@ export async function middleware(request: NextRequest) {
   
   if (
     maliciousBots.some(bot => userAgent.toLowerCase().includes(bot)) &&
-    !pathname.startsWith('/api/scheduled-posts')
+    !pathname.startsWith('/api/scheduled-posts') &&
+    !pathname.includes('/sitemap.xml') &&
+    !pathname.includes('/robots.txt')
   ) {
     return new NextResponse('Forbidden', { status: 403 })
   }

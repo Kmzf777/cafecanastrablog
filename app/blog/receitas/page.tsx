@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { getPublishedPosts } from "@/lib/supabase"
+import { getPublishedPostsByType } from "@/lib/supabase"
 import BlogListClient from "../BlogListClient"
 
 export const metadata: Metadata = {
@@ -41,8 +41,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ReceitasPage() {
-  const allPosts = await getPublishedPosts()
-  const receitasPosts = allPosts.filter(post => post.post_type === "recipe")
+  const receitasPosts = await getPublishedPostsByType("recipe")
 
   return (
     <>
