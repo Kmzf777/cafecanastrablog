@@ -1,13 +1,38 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Criar cliente Supabase usando as variáveis de ambiente
-export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+// Função para criar cliente Supabase
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase environment variables are not configured")
+  }
+  
+  return createClient(supabaseUrl, supabaseKey)
+}
 
-// Cliente para server-side (usando as mesmas credenciais)
-export const supabaseServer = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+// Cliente para client-side (lazy loading)
+let supabaseClient: ReturnType<typeof createClient> | null = null
+export const supabase = {
+  get client() {
+    if (!supabaseClient) {
+      supabaseClient = createSupabaseClient()
+    }
+    return supabaseClient
+  }
+}
+
+// Cliente para server-side (lazy loading)
+let supabaseServerClient: ReturnType<typeof createClient> | null = null
+export const supabaseServer = {
+  get client() {
+    if (!supabaseServerClient) {
+      supabaseServerClient = createSupabaseClient()
+    }
+    return supabaseServerClient
+  }
+}
 
 // Função para debug das variáveis de ambiente
 export function debugEnvironmentVariables() {
@@ -316,7 +341,7 @@ export async function saveBlogPost(postData: any, modo: string): Promise<BlogPos
 
     console.log("blogPost final a ser salvo:", JSON.stringify(blogPost, null, 2))
 
-    const { data, error } = await supabase.from("blog_posts").insert([blogPost]).select().single()
+    const { data, error } = await supabase.client.from("blog_posts").insert([blogPost]).select().single()
 
     if (error) {
       console.error("❌ Erro ao salvar post no Supabase:", error)
@@ -338,7 +363,7 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
     console.log("Timestamp da consulta:", new Date().toISOString())
 
-    const { data, error } = await supabaseServer
+    const { data, error } = await supabaseServer.client
       .from("blog_posts")
       .select("*")
       .eq("status", "publicado")
@@ -372,7 +397,7 @@ export async function getPublishedPostsByType(postType: "recipe" | "news"): Prom
     console.log(`=== BUSCANDO POSTS PUBLICADOS DO TIPO: ${postType} ===`)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabaseServer
+    const { data, error } = await supabaseServer.client
       .from("blog_posts")
       .select("*")
       .eq("status", "publicado")
@@ -399,7 +424,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     console.log("Slug:", slug)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabaseServer
+    const { data, error } = await supabaseServer.client
       .from("blog_posts")
       .select("*")
       .eq("slug", slug)
@@ -426,7 +451,7 @@ export async function getRecentPosts(limit = 4): Promise<BlogPost[]> {
     console.log("Limit:", limit)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabaseServer
+    const { data, error } = await supabaseServer.client
       .from("blog_posts")
       .select("id, titulo, slug, created_at")
       .eq("status", "publicado")
@@ -454,7 +479,7 @@ export async function getRecentPostsClient(limit = 4): Promise<BlogPost[]> {
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
     // Buscar todos os campos relevantes para o cálculo correto do tempo de leitura
-    const { data, error } = await supabase
+    const { data, error } = await supabase.client
       .from("blog_posts")
       .select("*") // Buscar todos os campos
       .eq("status", "publicado")
@@ -481,7 +506,7 @@ export async function updateBlogPost(id: string, updates: Partial<BlogPost>): Pr
     console.log("ID:", id)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase.client
       .from("blog_posts")
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq("id", id)
@@ -508,7 +533,7 @@ export async function deleteBlogPost(id: string): Promise<boolean> {
     console.log("ID:", id)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { error } = await supabase.from("blog_posts").delete().eq("id", id)
+    const { error } = await supabase.client.from("blog_posts").delete().eq("id", id)
 
     if (error) {
       console.error("❌ Erro ao deletar post:", error)
@@ -529,7 +554,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     console.log("=== BUSCANDO TODOS OS POSTS (ADMIN) ===")
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false })
+    const { data, error } = await supabase.client.from("blog_posts").select("*").order("created_at", { ascending: false })
 
     if (error) {
       console.error("❌ Erro ao buscar todos os posts:", error)
@@ -551,7 +576,7 @@ export async function testSupabaseConnection(): Promise<boolean> {
     console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
     console.log("Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabase.from("blog_posts").select("count", { count: "exact" }).limit(1)
+    const { data, error } = await supabase.client.from("blog_posts").select("count", { count: "exact" }).limit(1)
 
     if (error) {
       console.error("❌ Erro na conexão:", error)
@@ -571,14 +596,14 @@ export async function uploadImageToStorage(file: File, postId: string): Promise<
   try {
     const fileExt = file.name.split('.').pop()
     const filePath = `blog/${postId}/${Date.now()}.${fileExt}`
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabase.client.storage
       .from('blog-images') // nome do bucket
       .upload(filePath, file)
     if (error) {
       console.error('Erro ao fazer upload da imagem:', JSON.stringify(error, null, 2))
       return null
     }
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = supabase.client.storage
       .from('blog-images')
       .getPublicUrl(filePath)
     return publicUrlData?.publicUrl || null

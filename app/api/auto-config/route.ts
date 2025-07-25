@@ -1,10 +1,25 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase environment variables are not configured")
+  }
+  
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+// Lazy loading do cliente Supabase
+let supabaseClient: any = null
+function getSupabaseClient() {
+  if (!supabaseClient) {
+    supabaseClient = createSupabaseClient()
+  }
+  return supabaseClient
+}
 
 interface AutoConfig {
   isEnabled: boolean
@@ -44,7 +59,7 @@ function toCamelCase(obj: any): any {
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('auto_config')
       .select('*')
       .order('updated_at', { ascending: false })
@@ -109,7 +124,7 @@ export async function POST(request: Request) {
     const snakeCaseConfig = toSnakeCase(configWithTimestamp)
 
     // Salvar no Supabase
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('auto_config')
       .upsert([snakeCaseConfig], { 
         onConflict: 'id',
