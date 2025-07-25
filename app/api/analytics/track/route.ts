@@ -1,264 +1,217 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
-// Função para gerar ID de sessão único
-function generateSessionId(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-}
-
-// Função para detectar tipo de dispositivo baseado no user agent
+// Função para detectar tipo de dispositivo
 function detectDeviceType(userAgent: string): string {
-  if (!userAgent) return 'other'
-  
-  const ua = userAgent.toLowerCase()
-  
-  // Detectar bots
-  if (ua.includes('bot') || ua.includes('crawler') || ua.includes('spider')) {
-    return 'bot'
-  }
-  
-  // Detectar mobile
-  if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone') || ua.includes('ipad')) {
-    return 'mobile'
-  }
-  
-  // Detectar tablet
-  if (ua.includes('tablet') || ua.includes('ipad')) {
-    return 'tablet'
-  }
-  
-  // Desktop como padrão
+  if (/mobile|android|iphone|ipad|phone/i.test(userAgent)) return 'mobile'
+  if (/tablet|ipad/i.test(userAgent)) return 'tablet'
   return 'desktop'
 }
 
-// Função para detectar browser baseado no user agent
+// Função para detectar navegador
 function detectBrowser(userAgent: string): string {
-  if (!userAgent) return 'unknown'
-  
-  const ua = userAgent.toLowerCase()
-  
-  if (ua.includes('chrome')) return 'Chrome'
-  if (ua.includes('firefox')) return 'Firefox'
-  if (ua.includes('safari')) return 'Safari'
-  if (ua.includes('edge')) return 'Edge'
-  if (ua.includes('opera')) return 'Opera'
-  
-  return 'Other'
+  if (/chrome/i.test(userAgent)) return 'Chrome'
+  if (/firefox/i.test(userAgent)) return 'Firefox'
+  if (/safari/i.test(userAgent)) return 'Safari'
+  if (/edge/i.test(userAgent)) return 'Edge'
+  if (/opera/i.test(userAgent)) return 'Opera'
+  return 'Unknown'
 }
 
-// Função para detectar OS baseado no user agent
+// Função para detectar sistema operacional
 function detectOS(userAgent: string): string {
-  if (!userAgent) return 'unknown'
-  
-  const ua = userAgent.toLowerCase()
-  
-  if (ua.includes('windows')) return 'Windows'
-  if (ua.includes('mac') || ua.includes('os x')) return 'macOS'
-  if (ua.includes('linux')) return 'Linux'
-  if (ua.includes('android')) return 'Android'
-  if (ua.includes('ios') || ua.includes('iphone') || ua.includes('ipad')) return 'iOS'
-  
-  return 'Other'
+  if (/windows/i.test(userAgent)) return 'Windows'
+  if (/macintosh|mac os x/i.test(userAgent)) return 'macOS'
+  if (/linux/i.test(userAgent)) return 'Linux'
+  if (/android/i.test(userAgent)) return 'Android'
+  if (/ios/i.test(userAgent)) return 'iOS'
+  return 'Unknown'
 }
 
-// Função para determinar o tipo de página
+// Função para determinar tipo de página
 function determinePageType(pageUrl: string, postType?: string): string {
-  if (pageUrl === '/' || pageUrl === '/cafecanastra') return 'home'
-  if (pageUrl === '/blog') return 'blog'
-  if (postType === 'recipe') return 'recipe'
-  if (postType === 'news') return 'news'
-  if (pageUrl.includes('/blog/')) return 'blog_post'
+  if (postType === 'recipe') return 'receita'
+  if (postType === 'news') return 'noticia'
+  if (pageUrl.includes('/blog')) return 'blog'
+  if (pageUrl.includes('/cafecanastra') || pageUrl === '/') return 'home'
   return 'other'
+}
+
+// Função para gerar session ID
+function generateSessionId(): string {
+  return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 }
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('📊 Analytics Track: Iniciando requisição...')
+    
+    // Verificar variáveis de ambiente
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    console.log('🔧 Verificando variáveis de ambiente:')
+    console.log('- NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✅ Definida' : '❌ Não definida')
+    console.log('- NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseKey ? '✅ Definida' : '❌ Não definida')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('❌ CRÍTICO: Variáveis do Supabase não configuradas!')
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Configuração do Supabase não encontrada',
+        message: 'Tabelas não configuradas - configure as variáveis de ambiente na Vercel'
+      }, { status: 500 })
+    }
+
     const body = await request.json()
-    const {
+    const { pageUrl, pageTitle, postSlug, postType, visitDuration = 0, screenResolution, language } = body
+
+    console.log('📊 Dados recebidos:', {
       pageUrl,
       pageTitle,
       postSlug,
       postType,
-      visitDuration = 0,
+      visitDuration,
       screenResolution,
       language
-    } = body
+    })
 
-    // Obter informações do request
     const userAgent = request.headers.get('user-agent') || ''
-    const ipAddress = request.headers.get('x-forwarded-for') || 
-                     request.headers.get('x-real-ip') || 
-                     '127.0.0.1'
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '127.0.0.1'
     const referrer = request.headers.get('referer') || ''
 
-    // Gerar session ID
+    console.log('📊 Headers extraídos:', {
+      userAgent: userAgent.substring(0, 50) + '...',
+      ipAddress,
+      referrer: referrer.substring(0, 50) + '...'
+    })
+
     const sessionId = generateSessionId()
-
-    // Determinar tipo de página
     const pageType = determinePageType(pageUrl, postType)
-
-    // Detectar informações do dispositivo
     const deviceType = detectDeviceType(userAgent)
     const browser = detectBrowser(userAgent)
     const os = detectOS(userAgent)
 
-    // Preparar dados para inserção na tabela analytics
+    console.log('📊 Dados processados:', {
+      sessionId,
+      pageType,
+      deviceType,
+      browser,
+      os
+    })
+
     const analyticsData = {
       page_url: pageUrl,
       page_title: pageTitle,
+      post_slug: postSlug,
+      post_type: postType,
       page_type: pageType,
-      post_slug: postSlug || null,
-      post_type: postType || null,
       user_agent: userAgent,
       ip_address: ipAddress,
       referrer: referrer,
       device_type: deviceType,
       browser: browser,
       os: os,
-      screen_resolution: screenResolution || null,
-      language: language || null,
-      session_id: sessionId,
+      screen_resolution: screenResolution,
+      language: language,
       visit_duration: visitDuration,
-      bounce: true, // Será atualizado se o usuário visitar outras páginas
-      is_unique_visit: true,
+      session_id: sessionId,
       created_at: new Date().toISOString()
     }
 
-    console.log('📊 Analytics data to insert:', analyticsData)
+    console.log('📊 Tentando salvar no Supabase...')
 
-    // Tentar inserir na tabela analytics
-    let analyticsId = null
-    try {
-      const { data: analyticsResult, error: analyticsError } = await supabase
-        .from('analytics')
-        .insert([analyticsData])
-        .select('id')
-        .single()
+    // Insert into analytics table
+    const { data: analyticsResult, error: analyticsError } = await supabase
+      .from('analytics')
+      .insert([analyticsData])
+      .select('id')
+      .single()
 
-      if (analyticsError) {
-        console.error('❌ Erro ao inserir na tabela analytics:', analyticsError)
-        // Se as tabelas não existem, retornar resposta de fallback
-        return NextResponse.json({ 
-          success: true, 
-          sessionId,
-          analyticsId: null,
-          message: 'Analytics tracking funcionando (tabelas não configuradas)',
-          receivedData: {
-            pageUrl,
-            pageTitle,
-            postSlug,
-            postType,
-            visitDuration,
-            screenResolution,
-            language
-          }
-        })
-      }
-
-      analyticsId = analyticsResult?.id
-      console.log('✅ Analytics data inserted successfully, ID:', analyticsId)
-
-    } catch (error) {
-      console.error('❌ Erro ao inserir analytics:', error)
-      // Retornar resposta de fallback se as tabelas não existem
+    if (analyticsError) {
+      console.error('❌ Erro ao salvar analytics:', analyticsError)
       return NextResponse.json({ 
-        success: true, 
-        sessionId,
-        analyticsId: null,
-        message: 'Analytics tracking funcionando (tabelas não configuradas)',
-        receivedData: {
-          pageUrl,
-          pageTitle,
-          postSlug,
-          postType,
-          visitDuration,
-          screenResolution,
-          language
-        }
-      })
+        success: false, 
+        error: 'Erro ao salvar dados de analytics',
+        details: analyticsError.message
+      }, { status: 500 })
     }
 
-    // Tentar inserir/atualizar na tabela sessions
-    try {
-      // Verificar se já existe uma sessão para este IP
-      const { data: existingSession } = await supabase
+    const analyticsId = analyticsResult?.id
+    console.log('✅ Analytics salvo com sucesso, ID:', analyticsId)
+
+    // Handle session creation/update
+    const { data: existingSession, error: sessionCheckError } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('ip_address', ipAddress)
+      .single()
+
+    if (sessionCheckError && sessionCheckError.code !== 'PGRST116') {
+      console.error('❌ Erro ao verificar sessão:', sessionCheckError)
+    }
+
+    if (existingSession) {
+      // Update existing session
+      const { error: sessionUpdateError } = await supabase
         .from('sessions')
-        .select('*')
-        .eq('ip_address', ipAddress)
-        .single()
-
-      if (existingSession) {
-        // Atualizar sessão existente
-        const updatedPages = existingSession.pages_visited || []
-        if (!updatedPages.includes(pageUrl)) {
-          updatedPages.push(pageUrl)
-        }
-
-        const { error: updateError } = await supabase
-          .from('sessions')
-          .update({
-            last_visit_at: new Date().toISOString(),
-            visit_count: existingSession.visit_count + 1,
-            total_duration: existingSession.total_duration + visitDuration,
-            pages_visited: updatedPages
-          })
-          .eq('id', existingSession.id)
-
-        if (updateError) {
-          console.error('❌ Erro ao atualizar sessão:', updateError)
-        } else {
-          console.log('✅ Session updated successfully')
-        }
-      } else {
-        // Criar nova sessão
-        const sessionData = {
-          id: sessionId,
-          ip_address: ipAddress,
-          user_agent: userAgent,
-          first_visit_at: new Date().toISOString(),
-          last_visit_at: new Date().toISOString(),
-          visit_count: 1,
-          total_duration: visitDuration,
-          pages_visited: [pageUrl],
-          created_at: new Date().toISOString(),
+        .update({
+          last_activity: new Date().toISOString(),
+          page_views: existingSession.page_views + 1,
           updated_at: new Date().toISOString()
-        }
+        })
+        .eq('id', existingSession.id)
 
-        const { error: sessionError } = await supabase
-          .from('sessions')
-          .insert([sessionData])
-
-        if (sessionError) {
-          console.error('❌ Erro ao inserir sessão:', sessionError)
-        } else {
-          console.log('✅ New session created successfully')
-        }
+      if (sessionUpdateError) {
+        console.error('❌ Erro ao atualizar sessão:', sessionUpdateError)
+      } else {
+        console.log('✅ Sessão atualizada')
+      }
+    } else {
+      // Create new session
+      const sessionData = {
+        session_id: sessionId,
+        ip_address: ipAddress,
+        user_agent: userAgent,
+        device_type: deviceType,
+        browser: browser,
+        os: os,
+        screen_resolution: screenResolution,
+        language: language,
+        page_views: 1,
+        first_visit: new Date().toISOString(),
+        last_activity: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
 
-    } catch (error) {
-      console.error('❌ Erro ao gerenciar sessão:', error)
+      const { error: sessionCreateError } = await supabase
+        .from('sessions')
+        .insert([sessionData])
+
+      if (sessionCreateError) {
+        console.error('❌ Erro ao criar sessão:', sessionCreateError)
+      } else {
+        console.log('✅ Nova sessão criada')
+      }
     }
 
-    // Retornar resposta de sucesso
+    console.log('🎉 Analytics tracking concluído com sucesso!')
+
     return NextResponse.json({ 
       success: true, 
-      sessionId,
-      analyticsId,
-      message: 'Analytics tracking funcionando perfeitamente!',
-      receivedData: {
-        pageUrl,
-        pageTitle,
-        postSlug,
-        postType,
-        visitDuration,
-        screenResolution,
-        language
-      }
+      sessionId, 
+      analyticsId, 
+      message: 'Analytics tracking funcionando perfeitamente!' 
     })
 
   } catch (error) {
-    console.error('❌ Erro no tracking de analytics:', error)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    console.error('❌ Erro geral no analytics tracking:', error)
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Erro interno do servidor',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
 

@@ -1,4 +1,4 @@
-const BASE_URL = 'https://cafecanastra-blog.vercel.app' // URL de produção
+const BASE_URL = 'https://cafecanastra.com' // URL de produção correta
 
 // Função para fazer requisições HTTP
 async function makeRequest(url, options = {}) {
