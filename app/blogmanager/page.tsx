@@ -67,7 +67,6 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { useAutoConfig } from "@/hooks/use-auto-config"
 import { supabase } from "@/lib/supabase"
-import AnalyticsDashboard from "@/components/analytics-dashboard"
 
 export default function BlogManagerPage() {
   console.log("[DEBUG] BlogManagerPage renderizou");
@@ -760,7 +759,7 @@ export default function BlogManagerPage() {
             </div>
 
             <Tabs defaultValue="automatico" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6 bg-gray-100">
+              <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100">
                 <TabsTrigger value="automatico" className="data-[state=active]:bg-amber-600 data-[state=active]:text-white">
                   Postagem Automática
                 </TabsTrigger>
@@ -775,12 +774,6 @@ export default function BlogManagerPage() {
                   className="data-[state=active]:bg-amber-600 data-[state=active]:text-white"
                 >
                   Gerenciamento ({posts.length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="monitoramento"
-                  className="data-[state=active]:bg-amber-600 data-[state=active]:text-white"
-                >
-                  Monitoramento
                 </TabsTrigger>
               </TabsList>
 
@@ -1045,21 +1038,6 @@ export default function BlogManagerPage() {
                         ))}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Aba 4: Monitoramento */}
-              <TabsContent value="monitoramento">
-                <Card className="border-gray-200 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-gray-800">Dashboard de Monitoramento</CardTitle>
-                    <CardDescription className="text-gray-600">
-                      Análise completa das visualizações e métricas do site
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <AnalyticsDashboard />
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -81,9 +81,9 @@ export async function middleware(request: NextRequest) {
   // Headers de segurança
   const response = NextResponse.next()
   
-  // Ocultar informações do servidor (removido para evitar confusão)
-  // response.headers.set('Server', 'Apache/2.4.1')
-  // response.headers.set('X-Powered-By', 'PHP/8.1.0')
+  // Ocultar informações do servidor
+  response.headers.set('Server', 'Apache/2.4.1')
+  response.headers.set('X-Powered-By', 'PHP/8.1.0')
   
   // Headers de segurança
   response.headers.set('X-Content-Type-Options', 'nosniff')
@@ -92,27 +92,15 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
   
-  // CSP (Content Security Policy) - Mais permissivo para SEO
+  // CSP (Content Security Policy)
   response.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com; frame-ancestors 'none';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-ancestors 'none';"
   )
   
-  // Lista de bots legítimos que devem ter acesso
-  const legitimateBots = [
-    'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'facebookexternalhit', 
-    'twitterbot', 'linkedinbot', 'whatsapp', 'telegrambot', 'discordbot',
-    'applebot', 'yandexbot', 'baiduspider', 'sogou', 'ahrefsbot', 'semrushbot'
-  ]
-
-  // Rate limiting para APIs (exceto para bots legítimos)
+  // Rate limiting para APIs
   if (pathname.startsWith('/api/')) {
-    const userAgent = request.headers.get('user-agent') || ''
-    const isLegitimateBot = legitimateBots.some(bot => 
-      userAgent.toLowerCase().includes(bot.toLowerCase())
-    )
-    
-    if (!isLegitimateBot && isRateLimited(ip, 100, 60000)) { // 100 requests por minuto para APIs
+    if (isRateLimited(ip, 100, 60000)) { // 100 requests por minuto para APIs
       return new NextResponse(
         JSON.stringify({ error: 'Rate limit exceeded' }),
         { 
@@ -149,19 +137,14 @@ export async function middleware(request: NextRequest) {
     return new NextResponse('Not Found', { status: 404 })
   }
   
-  // Bloquear bots maliciosos (exceto para bots legítimos do Google e outros motores de busca)
+  // Bloquear bots maliciosos (exceto para sitemap e robots.txt)
   const userAgent = request.headers.get('user-agent') || ''
   const maliciousBots = [
-    'curl', 'wget', 'python', 'php', 'scraper'
+    'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 'python', 'php'
   ]
-  
-  const isLegitimateBot = legitimateBots.some(bot => 
-    userAgent.toLowerCase().includes(bot.toLowerCase())
-  )
   
   if (
     maliciousBots.some(bot => userAgent.toLowerCase().includes(bot)) &&
-    !isLegitimateBot &&
     !pathname.startsWith('/api/scheduled-posts') &&
     !pathname.includes('/sitemap.xml') &&
     !pathname.includes('/robots.txt')

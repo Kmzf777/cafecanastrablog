@@ -1,6 +1,0 @@
-# App-ads.txt para Café Canastra
-# Este arquivo indica que não há anúncios de terceiros no app
-# Evita problemas de indexação relacionados a anúncios em apps
-
-# Comentário: App não utiliza anúncios de terceiros
-# Data: 2025-01-18 

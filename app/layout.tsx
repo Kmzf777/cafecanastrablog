@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'N8TasACAZl8du6bWXtBGCGaWHXM2EMe6GEepmTpKi28',
+    google: 'your-google-verification-code',
   },
   openGraph: {
     type: 'website',
@@ -154,11 +154,14 @@ export default function RootLayout({
                 <img src="/logo-canastra.png" alt="Café Canastra" className="h-10 w-auto mb-4" />
                 <p className="text-[#e5e7eb]/90 mb-4 leading-relaxed">O melhor café artesanal da Serra da Canastra, cultivado com tradição e paixão desde 1985.</p>
                 <div className="flex space-x-4 mt-2">
-                  <a href="https://www.instagram.com/cafecanastra" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Instagram">
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Instagram">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                   </a>
-                  <a href="https://www.facebook.com/cafecanastra" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors" aria-label="Facebook">
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Facebook">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H5v4h5v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="YouTube">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.7" viewBox="0 0 24 24"><path d="M22.54 6.42A2.78 2.78 0 0 0 20.7 4.6C19.13 4.13 12 4.13 12 4.13s-7.13 0-8.7.47A2.78 2.78 0 0 0 1.46 6.42 29.94 29.94 0 0 0 1 12a29.94 29.94 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.84 1.82c1.57.47 8.7.47 8.7.47s7.13 0 8.7-.47a2.78 2.78 0 0 0 1.84-1.82A29.94 29.94 0 0 0 23 12a29.94 29.94 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
                   </a>
                 </div>
               </div>
@@ -166,8 +169,10 @@ export default function RootLayout({
               <div className="mb-8 md:mb-0">
                 <h4 className="text-amber-500 font-semibold text-base mb-3 flex items-center gap-2">Links Úteis</h4>
                 <ul className="space-y-2">
-                  <li><a href="/politica-privacidade" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Política de Privacidade</a></li>
-                  <li><a href="/termos-uso" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Termos de Uso</a></li>
+                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Política de Privacidade</a></li>
+                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Termos de Uso</a></li>
+                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Trocas e Devoluções</a></li>
+                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Frete e Entrega</a></li>
                 </ul>
               </div>
               {/* Coluna 3: Newsletter + informações da empresa */}

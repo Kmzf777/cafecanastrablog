@@ -31,7 +31,6 @@ import BlogNotification from "@/components/blog-notification"
 import ProductCarousel from "@/components/product-carousel"
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import BlogSection from "@/components/blog-section"
-import AnalyticsTracker from "@/components/analytics-tracker"
 
 export default function CafeCanastraWebsite() {
   const [isMenuScrolled, setIsMenuScrolled] = useState(false)
@@ -846,12 +845,6 @@ export default function CafeCanastraWebsite() {
       </motion.div>
 
       <BlogNotification />
-      
-      {/* Analytics Tracker */}
-      <AnalyticsTracker 
-        pageUrl="/cafecanastra"
-        pageTitle="Café Canastra - Café Especial da Serra da Canastra"
-      />
     </div>
   )
 }

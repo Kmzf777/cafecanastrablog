@@ -1,7 +1,0 @@
-# Security.txt para Café Canastra
-# Este arquivo fornece informações de segurança para pesquisadores
-
-Contact: mailto:comercial@cafecanastra.com
-Expires: 2026-01-18T00:00:00.000Z
-Preferred-Languages: pt-BR, en
-Canonical: https://cafecanastra.com/.well-known/security.txt 

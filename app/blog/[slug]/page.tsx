@@ -4,7 +4,6 @@ import { getPostBySlug, getRecentPosts } from "@/lib/supabase"
 import { calculateReadingTime, calculateWordCount } from "@/lib/utils"
 import ClientBlogPostPage from "./ClientBlogPostPage"
 import { generateBlogPostSchema } from "@/lib/utils"
-import AnalyticsTracker from "@/components/analytics-tracker"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -147,14 +146,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         post={post} 
         relatedPosts={relatedPosts} 
         category={undefined} // Posts sem categoria específica
-      />
-      
-      {/* Analytics Tracker */}
-      <AnalyticsTracker 
-        pageUrl={`/blog/${slug}`}
-        pageTitle={`${post.titulo} | Blog Café Canastra`}
-        postSlug={slug}
-        postType={post.post_type || undefined}
       />
     </>
   )

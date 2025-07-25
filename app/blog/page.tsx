@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { getPublishedPosts } from "@/lib/supabase"
 import BlogListClient from "./BlogListClient"
-import AnalyticsTracker from "@/components/analytics-tracker"
 
 export const metadata: Metadata = {
   title: "Blog | Café Canastra",
@@ -88,12 +87,6 @@ export default async function BlogPage() {
         initialPosts={posts} 
         categoryTitle="Blog"
         categoryDescription="Descubra os segredos do café especial, dicas de preparo e histórias da Serra da Canastra"
-      />
-      
-      {/* Analytics Tracker */}
-      <AnalyticsTracker 
-        pageUrl="/blog"
-        pageTitle="Blog | Café Canastra"
       />
     </>
   )
