@@ -276,4 +276,334 @@ function processWebhookData(postData: any): any {
         secoesEncontradas.push(i)
       }
     }
-    console.log(`
+    console.log(`Seções encontradas: ${secoesEncontradas.length} (${secoesEncontradas.join(', ')})`)
+  }
+  
+  // Manter compatibilidade com formato antigo (seções numeradas)
+  for (let i = 1; i <= 7; i++) {
+    const tituloKey = `seção ${i} titulo`
+    const textoKey = `seção ${i} texto`
+    const imagemKey = `imagem seção ${i}`
+    const altImagemKey = `alt imagem seção ${i}`
+    
+    if (postData[tituloKey]) {
+      processedData[`secao_${i}_titulo`] = postData[tituloKey]
+    }
+    if (postData[textoKey]) {
+      processedData[`secao_${i}_texto`] = postData[textoKey]
+    }
+    if (postData[imagemKey]) {
+      processedData[`imagem_secao_${i}`] = postData[imagemKey]
+    }
+    if (postData[altImagemKey]) {
+      processedData[`alt_imagem_secao_${i}`] = postData[altImagemKey]
+    }
+  }
+  
+  // Seções CTA
+  processedData.secao_cta_titulo = postData["seção cta titulo"] || null
+  processedData.secao_cta_texto = postData["seção cta texto"] || null
+  
+  console.log("=== DADOS PROCESSADOS FINAL ===")
+  console.log("Campos principais:", {
+    titulo: processedData.titulo,
+    slug: processedData.slug,
+    post_type: processedData.post_type,
+    resumo: processedData.resumo ? "Sim" : "Não",
+    conclusao: processedData.conclusao ? "Sim" : "Não"
+  })
+  
+  return processedData
+}
+
+// Função para salvar post no Supabase
+export async function saveBlogPost(postData: any, modo: string): Promise<BlogPost | null> {
+  try {
+    console.log("=== INICIANDO SALVAMENTO NO SUPABASE ===")
+    console.log("postData recebido:", JSON.stringify(postData, null, 2))
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+    console.log("Supabase Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Definida" : "❌ Não definida")
+
+    // Processar dados do webhook
+    const processedData = processWebhookData(postData)
+    console.log("Dados processados:", JSON.stringify(processedData, null, 2))
+
+    const blogPost = {
+      ...processedData,
+      modo: modo as "automático" | "personalizado",
+      status: "publicado" as const,
+    }
+
+    console.log("blogPost final a ser salvo:", JSON.stringify(blogPost, null, 2))
+
+    const { data, error } = await supabase.from("blog_posts").insert([blogPost]).select().single()
+
+    if (error) {
+      console.error("❌ Erro ao salvar post no Supabase:", error)
+      return null
+    }
+
+    console.log("✅ Post salvo com sucesso:", data)
+    return data
+  } catch (error) {
+    console.error("❌ Erro ao processar post:", error)
+    return null
+  }
+}
+
+// Função para buscar todos os posts publicados (server-side)
+export async function getPublishedPosts(): Promise<BlogPost[]> {
+  try {
+    console.log("=== BUSCANDO POSTS PUBLICADOS ===")
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+    console.log("Timestamp da consulta:", new Date().toISOString())
+
+    const { data, error } = await supabaseServer
+      .from("blog_posts")
+      .select("*")
+      .eq("status", "publicado")
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      console.error("❌ Erro ao buscar posts:", error)
+      return []
+    }
+
+    console.log(`✅ ${data?.length || 0} posts encontrados`)
+    
+    // Debug: mostrar detalhes dos posts encontrados
+    if (data && data.length > 0) {
+      console.log("Posts encontrados:")
+      data.forEach((post, index) => {
+        console.log(`${index + 1}. ${post.titulo} (${post.slug}) - Tipo: ${post.post_type} - Status: ${post.status}`)
+      })
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error("❌ Erro ao buscar posts:", error)
+    return []
+  }
+}
+
+// Função para buscar posts publicados por tipo (server-side)
+export async function getPublishedPostsByType(postType: "recipe" | "news"): Promise<BlogPost[]> {
+  try {
+    console.log(`=== BUSCANDO POSTS PUBLICADOS DO TIPO: ${postType} ===`)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabaseServer
+      .from("blog_posts")
+      .select("*")
+      .eq("status", "publicado")
+      .eq("post_type", postType)
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      console.error("❌ Erro ao buscar posts por tipo:", error)
+      return []
+    }
+
+    console.log(`✅ ${data?.length || 0} posts do tipo ${postType} encontrados`)
+    return data || []
+  } catch (error) {
+    console.error("❌ Erro ao buscar posts por tipo:", error)
+    return []
+  }
+}
+
+// Função para buscar post por slug (server-side)
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  try {
+    console.log("=== BUSCANDO POST POR SLUG ===")
+    console.log("Slug:", slug)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabaseServer
+      .from("blog_posts")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "publicado")
+      .single()
+
+    if (error) {
+      console.error("❌ Erro ao buscar post por slug:", error)
+      return null
+    }
+
+    console.log("✅ Post encontrado:", data?.titulo)
+    return data
+  } catch (error) {
+    console.error("❌ Erro ao buscar post por slug:", error)
+    return null
+  }
+}
+
+// Função para buscar posts recentes (server-side)
+export async function getRecentPosts(limit = 4): Promise<BlogPost[]> {
+  try {
+    console.log("=== BUSCANDO POSTS RECENTES (SERVER) ===")
+    console.log("Limit:", limit)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabaseServer
+      .from("blog_posts")
+      .select("id, titulo, slug, created_at")
+      .eq("status", "publicado")
+      .order("created_at", { ascending: false })
+      .limit(limit)
+
+    if (error) {
+      console.error("❌ Erro ao buscar posts recentes:", error)
+      return []
+    }
+
+    console.log(`✅ ${data?.length || 0} posts recentes encontrados`)
+    return data || []
+  } catch (error) {
+    console.error("❌ Erro ao buscar posts recentes:", error)
+    return []
+  }
+}
+
+// Função para buscar posts recentes (client-side)
+export async function getRecentPostsClient(limit = 4): Promise<BlogPost[]> {
+  try {
+    console.log("=== BUSCANDO POSTS RECENTES (CLIENT) ===")
+    console.log("Limit:", limit)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    // Buscar todos os campos relevantes para o cálculo correto do tempo de leitura
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .select("*") // Buscar todos os campos
+      .eq("status", "publicado")
+      .order("created_at", { ascending: false })
+      .limit(limit)
+
+    if (error) {
+      console.error("❌ Erro ao buscar posts recentes:", error)
+      return []
+    }
+
+    console.log(`✅ ${data?.length || 0} posts recentes encontrados`)
+    return data || []
+  } catch (error) {
+    console.error("❌ Erro ao buscar posts recentes:", error)
+    return []
+  }
+}
+
+// Função para atualizar post
+export async function updateBlogPost(id: string, updates: Partial<BlogPost>): Promise<BlogPost | null> {
+  try {
+    console.log("=== ATUALIZANDO POST ===")
+    console.log("ID:", id)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabase
+      .from("blog_posts")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("❌ Erro ao atualizar post:", error)
+      return null
+    }
+
+    console.log("✅ Post atualizado:", data?.titulo)
+    return data
+  } catch (error) {
+    console.error("❌ Erro ao atualizar post:", error)
+    return null
+  }
+}
+
+// Função para deletar post
+export async function deleteBlogPost(id: string): Promise<boolean> {
+  try {
+    console.log("=== DELETANDO POST ===")
+    console.log("ID:", id)
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { error } = await supabase.from("blog_posts").delete().eq("id", id)
+
+    if (error) {
+      console.error("❌ Erro ao deletar post:", error)
+      return false
+    }
+
+    console.log("✅ Post deletado com sucesso")
+    return true
+  } catch (error) {
+    console.error("❌ Erro ao deletar post:", error)
+    return false
+  }
+}
+
+// Função para buscar todos os posts (incluindo rascunhos) - para admin
+export async function getAllPosts(): Promise<BlogPost[]> {
+  try {
+    console.log("=== BUSCANDO TODOS OS POSTS (ADMIN) ===")
+    console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false })
+
+    if (error) {
+      console.error("❌ Erro ao buscar todos os posts:", error)
+      return []
+    }
+
+    console.log(`✅ ${data?.length || 0} posts encontrados (incluindo rascunhos)`)
+    return data || []
+  } catch (error) {
+    console.error("❌ Erro ao buscar todos os posts:", error)
+    return []
+  }
+}
+
+// Função de teste para verificar conexão
+export async function testSupabaseConnection(): Promise<boolean> {
+  try {
+    console.log("=== TESTANDO CONEXÃO SUPABASE ===")
+    console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log("Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Definida" : "❌ Não definida")
+
+    const { data, error } = await supabase.from("blog_posts").select("count", { count: "exact" }).limit(1)
+
+    if (error) {
+      console.error("❌ Erro na conexão:", error)
+      return false
+    }
+
+    console.log("✅ Conexão Supabase OK")
+    return true
+  } catch (error) {
+    console.error("❌ Erro ao testar conexão:", error)
+    return false
+  }
+}
+
+// Função para upload de imagem no Supabase Storage
+export async function uploadImageToStorage(file: File, postId: string): Promise<string | null> {
+  try {
+    const fileExt = file.name.split('.').pop()
+    const filePath = `blog/${postId}/${Date.now()}.${fileExt}`
+    const { data, error } = await supabase.storage
+      .from('blog-images') // nome do bucket
+      .upload(filePath, file)
+    if (error) {
+      console.error('Erro ao fazer upload da imagem:', JSON.stringify(error, null, 2))
+      return null
+    }
+    const { data: publicUrlData } = supabase.storage
+      .from('blog-images')
+      .getPublicUrl(filePath)
+    return publicUrlData?.publicUrl || null
+  } catch (error) {
+    console.error('Erro ao fazer upload da imagem:', error)
+    return null
+  }
+}
