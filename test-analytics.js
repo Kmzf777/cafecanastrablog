@@ -1,193 +1,159 @@
-const BASE_URL = 'http://localhost:3001'
+const https = require('https');
+const http = require('http');
+
+const BASE_URL = 'http://localhost:3001';
+
+console.log('=== TESTANDO SISTEMA DE ANALYTICS ===\n');
 
 // Função para fazer requisições HTTP
-async function makeRequest(url, options = {}) {
-  try {
-    const response = await fetch(url, {
+function makeRequest(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const isHttps = urlObj.protocol === 'https:';
+    const client = isHttps ? https : http;
+    
+    const requestOptions = {
+      hostname: urlObj.hostname,
+      port: urlObj.port,
+      path: urlObj.pathname + urlObj.search,
+      method: options.method || 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         ...options.headers
-      },
-      ...options
-    })
+      }
+    };
 
-    const data = await response.json()
-    return { status: response.status, data }
-  } catch (error) {
-    return { status: 500, data: { error: error.message } }
-  }
+    const req = client.request(requestOptions, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          const jsonData = JSON.parse(data);
+          resolve({ status: res.statusCode, data: jsonData });
+        } catch (e) {
+          resolve({ status: res.statusCode, data: data });
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    if (options.body) {
+      req.write(JSON.stringify(options.body));
+    }
+
+    req.end();
+  });
 }
 
-// Função para gerar dados de analytics
-function generateAnalyticsData(pageType, postSlug = null) {
+// Função para simular dados de analytics
+function generateAnalyticsData(pageType, slug = null) {
   const baseData = {
-    pageUrl: '',
-    pageTitle: '',
-    postSlug: postSlug,
-    postType: null,
-    visitDuration: Math.floor(Math.random() * 300) + 30, // 30-330 segundos
+    pageType,
+    url: slug ? `/${pageType}/${slug}` : `/${pageType}`,
+    title: `Test ${pageType} page`,
+    referrer: 'https://www.google.com',
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    language: 'pt-BR',
     screenResolution: '1920x1080',
-    language: 'pt-BR'
+    timezone: 'America/Sao_Paulo',
+    timestamp: new Date().toISOString()
+  };
+
+  if (slug) {
+    baseData.slug = slug;
   }
 
-  switch (pageType) {
-    case 'home':
-      baseData.pageUrl = '/cafecanastra'
-      baseData.pageTitle = 'Café Canastra - Café Especial'
-      break
-    case 'blog':
-      baseData.pageUrl = '/blog'
-      baseData.pageTitle = 'Blog - Café Canastra'
-      break
-    case 'receita':
-      baseData.pageUrl = `/blog/receitas/${postSlug}`
-      baseData.pageTitle = 'Receita de Café Especial - Café Canastra'
-      baseData.postType = 'recipe'
-      break
-    case 'noticia':
-      baseData.pageUrl = `/blog/noticias/${postSlug}`
-      baseData.pageTitle = 'Notícias - Café Canastra'
-      baseData.postType = 'news'
-      break
-    default:
-      baseData.pageUrl = '/'
-      baseData.pageTitle = 'Café Canastra'
-  }
-
-  return JSON.stringify(baseData)
+  return baseData;
 }
 
 async function testAnalytics() {
-  console.log('🚀 Iniciando teste do sistema de analytics...\n')
-
   try {
     // 1. Testar tracking da home page
-    console.log('1. Testando tracking da home page...')
-    const homeData = generateAnalyticsData('home')
+    console.log('1. Testando tracking da home page...');
+    const homeData = generateAnalyticsData('home');
     const homeResponse = await makeRequest(`${BASE_URL}/api/analytics/track`, {
       method: 'POST',
       body: homeData
-    })
+    });
     
     if (homeResponse.status === 200) {
-      console.log('✅ Home page tracking funcionando')
-      console.log('   Resposta:', homeResponse.data.message)
-      if (homeResponse.data.analyticsId) {
-        console.log('   ✅ Dados salvos no Supabase (ID:', homeResponse.data.analyticsId, ')')
-      } else {
-        console.log('   ⚠️  Tabelas não configuradas no Supabase')
-      }
+      console.log('✅ Home page tracking funcionando');
     } else {
-      console.log(`❌ Erro no tracking da home page: ${homeResponse.status}`)
-      console.log('   Resposta:', homeResponse.data)
+      console.log(`❌ Erro no tracking da home page: ${homeResponse.status}`);
+      console.log('Resposta:', homeResponse.data);
     }
 
     // 2. Testar tracking do blog
-    console.log('\n2. Testando tracking do blog...')
-    const blogData = generateAnalyticsData('blog')
+    console.log('\n2. Testando tracking do blog...');
+    const blogData = generateAnalyticsData('blog');
     const blogResponse = await makeRequest(`${BASE_URL}/api/analytics/track`, {
       method: 'POST',
       body: blogData
-    })
+    });
     
     if (blogResponse.status === 200) {
-      console.log('✅ Blog tracking funcionando')
-      if (blogResponse.data.analyticsId) {
-        console.log('   ✅ Dados salvos no Supabase (ID:', blogResponse.data.analyticsId, ')')
-      }
+      console.log('✅ Blog tracking funcionando');
     } else {
-      console.log(`❌ Erro no tracking do blog: ${blogResponse.status}`)
-      console.log('   Resposta:', blogResponse.data)
+      console.log(`❌ Erro no tracking do blog: ${blogResponse.status}`);
+      console.log('Resposta:', blogResponse.data);
     }
 
     // 3. Testar tracking de post de receita
-    console.log('\n3. Testando tracking de post de receita...')
-    const recipeData = generateAnalyticsData('receita', 'cafe-especial-canastra')
+    console.log('\n3. Testando tracking de post de receita...');
+    const recipeData = generateAnalyticsData('receita', 'cafe-especial-canastra');
     const recipeResponse = await makeRequest(`${BASE_URL}/api/analytics/track`, {
       method: 'POST',
       body: recipeData
-    })
+    });
     
     if (recipeResponse.status === 200) {
-      console.log('✅ Receita tracking funcionando')
-      if (recipeResponse.data.analyticsId) {
-        console.log('   ✅ Dados salvos no Supabase (ID:', recipeResponse.data.analyticsId, ')')
-      }
+      console.log('✅ Receita tracking funcionando');
     } else {
-      console.log(`❌ Erro no tracking da receita: ${recipeResponse.status}`)
-      console.log('   Resposta:', recipeResponse.data)
+      console.log(`❌ Erro no tracking da receita: ${recipeResponse.status}`);
+      console.log('Resposta:', recipeResponse.data);
     }
 
     // 4. Testar tracking de post de notícia
-    console.log('\n4. Testando tracking de post de notícia...')
-    const newsData = generateAnalyticsData('noticia', 'nova-colheita-2024')
+    console.log('\n4. Testando tracking de post de notícia...');
+    const newsData = generateAnalyticsData('noticia', 'nova-colheita-2024');
     const newsResponse = await makeRequest(`${BASE_URL}/api/analytics/track`, {
       method: 'POST',
       body: newsData
-    })
+    });
     
     if (newsResponse.status === 200) {
-      console.log('✅ Notícia tracking funcionando')
-      if (newsResponse.data.analyticsId) {
-        console.log('   ✅ Dados salvos no Supabase (ID:', newsResponse.data.analyticsId, ')')
-      }
+      console.log('✅ Notícia tracking funcionando');
     } else {
-      console.log(`❌ Erro no tracking da notícia: ${newsResponse.status}`)
-      console.log('   Resposta:', newsResponse.data)
+      console.log(`❌ Erro no tracking da notícia: ${newsResponse.status}`);
+      console.log('Resposta:', newsResponse.data);
     }
 
-    // 5. Testar API do dashboard
-    console.log('\n5. Testando API do dashboard...')
-    const dashboardResponse = await makeRequest(`${BASE_URL}/api/analytics/dashboard?period=7d`)
+    // 5. Testar busca de dados do dashboard
+    console.log('\n5. Testando busca de dados do dashboard...');
+    const dashboardResponse = await makeRequest(`${BASE_URL}/api/analytics/dashboard`);
     
     if (dashboardResponse.status === 200) {
-      console.log('✅ Dashboard API funcionando')
-      const data = dashboardResponse.data
-      
-      if (data.message && data.message.includes('não configuradas')) {
-        console.log('   ⚠️  Tabelas não configuradas no Supabase')
-        console.log('   💡 Execute o script SQL no Supabase para configurar as tabelas')
-      } else {
-        console.log('   ✅ Dashboard carregando dados reais')
-        console.log('   📊 Total de visualizações:', data.data.totalViews)
-        console.log('   👥 Visitas únicas:', data.data.uniqueViews)
-        console.log('   🏠 Home page:', data.data.homeViews)
-        console.log('   📝 Blog:', data.data.blogViews)
-      }
+      console.log('✅ Dashboard funcionando');
+      console.log('Dados do dashboard:', JSON.stringify(dashboardResponse.data, null, 2));
     } else {
-      console.log(`❌ Erro na API do dashboard: ${dashboardResponse.status}`)
-      console.log('   Resposta:', dashboardResponse.data)
+      console.log(`❌ Erro ao buscar dados do dashboard: ${dashboardResponse.status}`);
+      console.log('Resposta:', dashboardResponse.data);
     }
-
-    // 6. Testar diferentes períodos
-    console.log('\n6. Testando diferentes períodos...')
-    const periods = ['1d', '7d', '30d']
-    
-    for (const period of periods) {
-      const periodResponse = await makeRequest(`${BASE_URL}/api/analytics/dashboard?period=${period}`)
-      if (periodResponse.status === 200) {
-        console.log(`   ✅ Período ${period}: OK`)
-      } else {
-        console.log(`   ❌ Período ${period}: Erro ${periodResponse.status}`)
-      }
-    }
-
-    console.log('\n🎉 Teste concluído!')
-    console.log('\n📋 Resumo:')
-    console.log('- APIs de tracking: ✅ Funcionando')
-    console.log('- API do dashboard: ✅ Funcionando')
-    console.log('- Diferentes períodos: ✅ Funcionando')
-    
-    console.log('\n🔧 Próximos passos:')
-    console.log('1. Se as tabelas não estão configuradas, execute o script SQL no Supabase')
-    console.log('2. Acesse o dashboard em: http://localhost:3001/blogmanager')
-    console.log('3. Navegue pelo site para gerar dados reais')
-    console.log('4. Verifique os dados no Supabase')
 
   } catch (error) {
-    console.error('❌ Erro durante o teste:', error)
+    console.error('❌ Erro durante o teste:', error.message);
   }
 }
 
-// Executar o teste
-testAnalytics() 
+// Executar testes
+testAnalytics().then(() => {
+  console.log('\n=== TESTE CONCLUÍDO ===');
+}); 

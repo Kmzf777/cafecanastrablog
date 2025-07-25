@@ -1,16 +1,30 @@
 import { createClient } from "@supabase/supabase-js"
 
 // Criar cliente Supabase usando as variáveis de ambiente
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-)
+export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 // Cliente para server-side (usando as mesmas credenciais)
 export const supabaseServer = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
+
+// Função para debug das variáveis de ambiente
+export function debugEnvironmentVariables() {
+  console.log("=== SUPABASE ENVIRONMENT VARIABLES DEBUG ===")
+  console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Set" : "❌ Not set")
+  console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Set" : "❌ Not set")
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    console.log("URL Value:", process.env.NEXT_PUBLIC_SUPABASE_URL)
+  }
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.log("Key starts with:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.substring(0, 10) + "...")
+  }
+
+  console.log("=== END DEBUG ===")
+}
 
 export interface BlogPost {
   id: string

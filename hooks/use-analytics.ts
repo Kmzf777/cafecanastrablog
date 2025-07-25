@@ -31,17 +31,7 @@ export function useAnalytics(
 
   // Função para rastrear visualização
   const trackPageView = async (duration?: number) => {
-    if (!enabled) {
-      console.log('🚫 Analytics: Desabilitado')
-      return
-    }
-    
-    if (hasTracked.current) {
-      console.log('🚫 Analytics: Já foi rastreado nesta sessão')
-      return
-    }
-
-    console.log('📊 Analytics: Iniciando tracking...')
+    if (!enabled || hasTracked.current) return
 
     try {
       const visitDuration = duration || Math.floor((Date.now() - startTime.current) / 1000)
@@ -53,8 +43,6 @@ export function useAnalytics(
         language: data.language || navigator.language
       }
 
-      console.log('📊 Analytics: Dados a serem enviados:', analyticsData)
-
       const response = await fetch('/api/analytics/track', {
         method: 'POST',
         headers: {
@@ -63,36 +51,36 @@ export function useAnalytics(
         body: JSON.stringify(analyticsData),
       })
 
-      console.log('📊 Analytics: Resposta do servidor:', response.status)
-
       if (response.ok) {
-        const result = await response.json()
-        console.log('📊 Analytics: Resposta completa:', result)
-        
         hasTracked.current = true
-        console.log('✅ Analytics: Tracking realizado com sucesso')
+        console.log('Analytics tracked successfully')
       } else {
-        console.error('❌ Analytics: Falha no tracking - Status:', response.status)
-        const errorText = await response.text()
-        console.error('❌ Analytics: Erro detalhado:', errorText)
+        console.error('Failed to track analytics')
       }
     } catch (error) {
-      console.error('❌ Analytics: Erro no tracking:', error)
+      console.error('Error tracking analytics:', error)
     }
   }
 
   // Rastrear ao montar o componente
   useEffect(() => {
-    if (trackOnMount && enabled) {
-      console.log('📊 Analytics: Componente montado, aguardando para tracking...')
+    if (trackOnMount) {
+      trackPageView()
     }
-  }, [trackOnMount, enabled])
+
+    // Rastrear ao desmontar o componente
+    return () => {
+      if (trackOnUnmount && !hasTracked.current) {
+        const duration = Math.floor((Date.now() - startTime.current) / 1000)
+        trackPageView(duration)
+      }
+    }
+  }, [trackOnMount, trackOnUnmount])
 
   // Rastrear quando o usuário sai da página
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (!hasTracked.current && enabled) {
-        console.log('📊 Analytics: Usuário saindo da página, enviando dados...')
+      if (!hasTracked.current) {
         const duration = Math.floor((Date.now() - startTime.current) / 1000)
         // Usar sendBeacon para garantir que os dados sejam enviados
         const analyticsData = {
@@ -103,11 +91,9 @@ export function useAnalytics(
         }
 
         if (navigator.sendBeacon) {
-          const success = navigator.sendBeacon('/api/analytics/track', JSON.stringify(analyticsData))
-          console.log('📊 Analytics: sendBeacon enviado:', success)
+          navigator.sendBeacon('/api/analytics/track', JSON.stringify(analyticsData))
         } else {
           // Fallback para navegadores que não suportam sendBeacon
-          console.log('📊 Analytics: Usando fallback para navegadores sem sendBeacon')
           trackPageView(duration)
         }
       }
@@ -115,7 +101,7 @@ export function useAnalytics(
 
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [enabled])
+  }, [])
 
   return {
     trackPageView,
@@ -135,8 +121,6 @@ export function useAnalyticsData(period: string = '7d', pageType: string = 'all'
         setLoading(true)
         setError(null)
 
-        console.log('📊 Dashboard: Buscando dados...')
-
         const response = await fetch(`/api/analytics/dashboard?period=${period}&pageType=${pageType}`)
         
         if (!response.ok) {
@@ -144,11 +128,8 @@ export function useAnalyticsData(period: string = '7d', pageType: string = 'all'
         }
 
         const result = await response.json()
-        console.log('📊 Dashboard: Dados recebidos:', result)
-        
         setData(result.data)
       } catch (err) {
-        console.error('❌ Dashboard: Erro ao buscar dados:', err)
         setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         setLoading(false)
@@ -165,8 +146,6 @@ export function useAnalyticsData(period: string = '7d', pageType: string = 'all'
 export function useAnalyticsEvent() {
   const trackEvent = async (eventName: string, eventData: any = {}) => {
     try {
-      console.log('📊 Event: Rastreando evento:', eventName, eventData)
-
       const response = await fetch('/api/analytics/track', {
         method: 'POST',
         headers: {
@@ -180,12 +159,12 @@ export function useAnalyticsEvent() {
       })
 
       if (response.ok) {
-        console.log(`✅ Event: Evento ${eventName} rastreado com sucesso`)
+        console.log(`Event ${eventName} tracked successfully`)
       } else {
-        console.error(`❌ Event: Falha ao rastrear evento ${eventName}`)
+        console.error(`Failed to track event ${eventName}`)
       }
     } catch (error) {
-      console.error(`❌ Event: Erro ao rastrear evento ${eventName}:`, error)
+      console.error(`Error tracking event ${eventName}:`, error)
     }
   }
 
