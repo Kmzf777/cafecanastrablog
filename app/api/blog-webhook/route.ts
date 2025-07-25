@@ -101,7 +101,8 @@ export async function POST(request: NextRequest) {
         revalidatePath('/blog/noticias')
         
         // Chamar endpoint de revalidação para garantir
-        const revalidateResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/revalidate-sitemap`, {
+        const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
+        const revalidateResponse = await fetch(`${baseUrl}/api/revalidate-sitemap`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         })
