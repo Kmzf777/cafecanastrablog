@@ -32,6 +32,7 @@ import ProductCarousel from "@/components/product-carousel"
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import BlogSection from "@/components/blog-section"
 import AnalyticsTracker from "@/components/analytics-tracker"
+import AnalyticsDebug from "@/components/analytics-debug"
 
 export default function CafeCanastraWebsite() {
   const [isMenuScrolled, setIsMenuScrolled] = useState(false)
@@ -849,6 +850,12 @@ export default function CafeCanastraWebsite() {
       
       {/* Analytics Tracker */}
       <AnalyticsTracker 
+        pageUrl="/cafecanastra"
+        pageTitle="Café Canastra - Café Especial da Serra da Canastra"
+      />
+
+      {/* Analytics Debug - TEMPORÁRIO */}
+      <AnalyticsDebug 
         pageUrl="/cafecanastra"
         pageTitle="Café Canastra - Café Especial da Serra da Canastra"
       />
