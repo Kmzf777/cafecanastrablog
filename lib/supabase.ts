@@ -439,7 +439,7 @@ export async function getRecentPosts(limit = 4): Promise<BlogPost[]> {
     }
 
     console.log(`✅ ${data?.length || 0} posts recentes encontrados`)
-    return data || []
+    return (data as BlogPost[]) || []
   } catch (error) {
     console.error("❌ Erro ao buscar posts recentes:", error)
     return []

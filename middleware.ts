@@ -74,7 +74,7 @@ async function verifyToken(token: string): Promise<boolean> {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
   
   console.log(`[MIDDLEWARE] Acessando: ${pathname}`)
   

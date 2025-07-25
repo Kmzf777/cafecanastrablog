@@ -26,6 +26,7 @@ export async function GET() {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Erro na API:", error);
-    return NextResponse.json({ error: 'Erro ao buscar posts', details: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return NextResponse.json({ error: 'Erro ao buscar posts', details: errorMessage }, { status: 500 });
   }
 } 

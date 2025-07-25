@@ -68,7 +68,7 @@ export default function BlogBreadcrumb({ postTitle, postSlug, category }: BlogBr
                   {item.name}
                 </BreadcrumbPage>
               ) : (
-                <BreadcrumbLink asChild>
+                <BreadcrumbLink>
                   <Link 
                     href={item.href}
                     className="text-gray-600 hover:text-amber-600 transition-colors"

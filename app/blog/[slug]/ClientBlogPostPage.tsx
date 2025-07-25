@@ -338,7 +338,7 @@ export default function ClientBlogPostPage({ post, relatedPosts = [], category }
                 <OptimizedImage
                   src={post.imagem_titulo}
                   alt={post.alt_imagem_titulo || post.titulo}
-                  caption={post.alt_imagem_titulo}
+                  caption={post.alt_imagem_titulo || undefined}
                   priority={true}
                   className="w-full h-auto max-w-full rounded-xl shadow-lg"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 66vw"
