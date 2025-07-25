@@ -25,24 +25,12 @@ export default function LoginPage() {
 
   const { toast } = useToast()
 
-  // Verificar se já está logado (apenas Supabase Auth)
+  // Verificar se o Supabase está configurado
   useEffect(() => {
-    // Verificar se o Supabase está configurado
     if (!isSupabaseConfigured()) {
       console.error("❌ Supabase não configurado!")
       setSupabaseError("Configuração do Supabase não encontrada")
-      return
     }
-
-    // Só tentar autenticação se o Supabase estiver configurado
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (error) {
-        console.error("❌ Erro ao verificar usuário:", error)
-        setSupabaseError(error.message)
-      } else if (data?.user) {
-        window.location.href = '/blogmanager'
-      }
-    })
   }, [])
 
   // Verificar bloqueio por tentativas
