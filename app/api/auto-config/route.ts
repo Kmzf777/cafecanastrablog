@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-)
+// Verificar se as variáveis de ambiente estão definidas
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+// Criar cliente Supabase apenas se as variáveis estiverem definidas
+const supabase = supabaseUrl && supabaseKey 
+  ? createClient(supabaseUrl, supabaseKey)
+  : null
 
 interface AutoConfig {
   isEnabled: boolean
@@ -44,6 +48,20 @@ function toCamelCase(obj: any): any {
 
 export async function GET() {
   try {
+    // Verificar se o Supabase está configurado
+    if (!supabase) {
+      console.warn('Supabase não configurado - retornando configuração padrão')
+      const defaultConfig: AutoConfig = {
+        isEnabled: false,
+        startHour: 7,
+        endHour: 10,
+        modo: "automático",
+        tema: "",
+        publico_alvo: ""
+      }
+      return NextResponse.json(defaultConfig)
+    }
+
     const { data, error } = await supabase
       .from('auto_config')
       .select('*')
@@ -80,6 +98,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // Verificar se o Supabase está configurado
+    if (!supabase) {
+      console.warn('Supabase não configurado - retornando erro')
+      return NextResponse.json({ error: 'Supabase não configurado' }, { status: 503 })
+    }
+
     const config: AutoConfig = await request.json()
     
     // Validar dados
