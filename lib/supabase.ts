@@ -18,22 +18,34 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 // Criar cliente Supabase usando as variáveis de ambiente
+// Se as variáveis não estiverem definidas, criar cliente com valores padrão válidos
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseUrl || 'https://placeholder.supabase.co',
   supabaseKey || 'placeholder-key'
 )
 
 // Cliente para server-side (usando as mesmas credenciais)
 export const supabaseServer = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseKey || 'placeholder-key',
+  supabaseKey || 'placeholder-key'
 )
+
+// Função para verificar se o Supabase está configurado
+export function isSupabaseConfigured(): boolean {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  return !!(supabaseUrl && supabaseKey && 
+    supabaseUrl !== 'https://placeholder.supabase.co' && 
+    supabaseKey !== 'placeholder-key')
+}
 
 // Função para debug das variáveis de ambiente
 export function debugEnvironmentVariables() {
   console.log("=== SUPABASE ENVIRONMENT VARIABLES DEBUG ===")
   console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Set" : "❌ Not set")
   console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Set" : "❌ Not set")
+  console.log("Is Supabase Configured:", isSupabaseConfigured() ? "✅ Yes" : "❌ No")
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     console.log("URL Value:", process.env.NEXT_PUBLIC_SUPABASE_URL)

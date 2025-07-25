@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase'
 
 // Função para detectar tipo de dispositivo
 function detectDeviceType(userAgent: string): string {
@@ -46,16 +46,9 @@ export async function POST(request: NextRequest) {
   try {
     console.log('📊 Analytics Track: Iniciando requisição...')
     
-    // Verificar variáveis de ambiente
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
-    console.log('🔧 Verificando variáveis de ambiente:')
-    console.log('- NEXT_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✅ Definida' : '❌ Não definida')
-    console.log('- NEXT_PUBLIC_SUPABASE_ANON_KEY:', supabaseKey ? '✅ Definida' : '❌ Não definida')
-    
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('❌ CRÍTICO: Variáveis do Supabase não configuradas!')
+    // Verificar se o Supabase está configurado
+    if (!isSupabaseConfigured()) {
+      console.error('❌ CRÍTICO: Supabase não configurado!')
       return NextResponse.json({ 
         success: false, 
         error: 'Configuração do Supabase não encontrada',
