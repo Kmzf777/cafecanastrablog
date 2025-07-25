@@ -30,6 +30,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
+    "dotenv": "^17.2.1",
     "framer-motion": "latest",
     "jose": "^6.0.11",
     "lucide-react": "^0.454.0",
