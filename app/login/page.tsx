@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Loader2, Shield, Eye, EyeOff, Coffee } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 
 export default function LoginPage() {
   console.log("LoginPage renderizando...")
@@ -21,16 +21,16 @@ export default function LoginPage() {
   const [loginAttempts, setLoginAttempts] = useState(0)
   const [isBlocked, setIsBlocked] = useState(false)
   const [blockTime, setBlockTime] = useState(0)
-  const [supabaseError, setSupabaseError] = useState<string | null>(null)
 
   const { toast } = useToast()
 
-  // Verificar se o Supabase está configurado
+  // Verificar se já está logado (apenas Supabase Auth)
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      console.error("❌ Supabase não configurado!")
-      setSupabaseError("Configuração do Supabase não encontrada")
-    }
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) {
+        window.location.href = '/blogmanager'
+      }
+    })
   }, [])
 
   // Verificar bloqueio por tentativas
@@ -57,16 +57,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (supabaseError) {
-      toast({
-        title: "Erro de configuração",
-        description: "Sistema não configurado corretamente",
-        variant: "destructive",
-      })
-      return
-    }
-    
     if (isBlocked) {
       toast({
         title: "Acesso bloqueado",
@@ -154,17 +144,6 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
-            {supabaseError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">
-                  Erro no login Supabase
-                </p>
-                <p className="text-xs text-red-500 mt-1">
-                  {supabaseError}
-                </p>
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm font-medium text-gray-700">
@@ -176,7 +155,7 @@ export default function LoginPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Digite seu usuário"
-                  disabled={isLoading || isBlocked || !!supabaseError}
+                  disabled={isLoading || isBlocked}
                   className="border-gray-300 focus:border-amber-500 focus:ring-amber-500"
                   autoComplete="username"
                 />
@@ -193,7 +172,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Digite sua senha"
-                    disabled={isLoading || isBlocked || !!supabaseError}
+                    disabled={isLoading || isBlocked}
                     className="border-gray-300 focus:border-amber-500 focus:ring-amber-500 pr-10"
                     autoComplete="current-password"
                   />
@@ -201,7 +180,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    disabled={isLoading || isBlocked || !!supabaseError}
+                    disabled={isLoading || isBlocked}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-gray-400" />
@@ -222,7 +201,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                disabled={isLoading || isBlocked || !!supabaseError}
+                disabled={isLoading || isBlocked}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2"
               >
                 {isLoading ? (

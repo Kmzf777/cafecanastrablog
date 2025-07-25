@@ -1,62 +1,16 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Verificar se as variáveis de ambiente estão definidas
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error("❌ CRÍTICO: Variáveis do Supabase não configuradas!")
-  console.error("NEXT_PUBLIC_SUPABASE_URL:", supabaseUrl ? "✅" : "❌")
-  console.error("NEXT_PUBLIC_SUPABASE_ANON_KEY:", supabaseKey ? "✅" : "❌")
-  
-  // Em desenvolvimento, tentar carregar do .env.local
-  if (process.env.NODE_ENV === 'development') {
-    console.log("🔧 Modo desenvolvimento - verifique o arquivo .env.local")
-  } else {
-    console.log("🚀 Modo produção - configure as variáveis na Vercel")
-  }
-}
-
 // Criar cliente Supabase usando as variáveis de ambiente
-// Se as variáveis não estiverem definidas, criar cliente com valores padrão válidos
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseKey || 'placeholder-key'
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
 // Cliente para server-side (usando as mesmas credenciais)
 export const supabaseServer = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseKey || 'placeholder-key'
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
-
-// Função para verificar se o Supabase está configurado
-export function isSupabaseConfigured(): boolean {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  
-  return !!(supabaseUrl && supabaseKey && 
-    supabaseUrl !== 'https://placeholder.supabase.co' && 
-    supabaseKey !== 'placeholder-key')
-}
-
-// Função para debug das variáveis de ambiente
-export function debugEnvironmentVariables() {
-  console.log("=== SUPABASE ENVIRONMENT VARIABLES DEBUG ===")
-  console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Set" : "❌ Not set")
-  console.log("NEXT_PUBLIC_SUPABASE_ANON_KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Set" : "❌ Not set")
-  console.log("Is Supabase Configured:", isSupabaseConfigured() ? "✅ Yes" : "❌ No")
-
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    console.log("URL Value:", process.env.NEXT_PUBLIC_SUPABASE_URL)
-  }
-
-  if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    console.log("Key starts with:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.substring(0, 10) + "...")
-  }
-
-  console.log("=== END DEBUG ===")
-}
 
 export interface BlogPost {
   id: string

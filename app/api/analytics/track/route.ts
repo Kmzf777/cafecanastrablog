@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 // Função para detectar tipo de dispositivo
 function detectDeviceType(userAgent: string): string {
@@ -46,16 +46,6 @@ export async function POST(request: NextRequest) {
   try {
     console.log('📊 Analytics Track: Iniciando requisição...')
     
-    // Verificar se o Supabase está configurado
-    if (!isSupabaseConfigured()) {
-      console.error('❌ CRÍTICO: Supabase não configurado!')
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Configuração do Supabase não encontrada',
-        message: 'Tabelas não configuradas - configure as variáveis de ambiente na Vercel'
-      }, { status: 500 })
-    }
-
     const body = await request.json()
     const { pageUrl, pageTitle, postSlug, postType, visitDuration = 0, screenResolution, language } = body
 
