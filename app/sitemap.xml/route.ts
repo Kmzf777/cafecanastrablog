@@ -1,52 +1,95 @@
 import { NextResponse } from 'next/server'
 import { getPublishedPosts } from '@/lib/supabase'
 
-interface UrlEntry {
-  loc: string;
-  lastmod?: string;
-  changefreq: string;
-  priority: number;
-}
-
 export async function GET() {
   const baseUrl = 'https://cafecanastra.com'
+  
+  // URLs estáticas
+  const staticUrls = [
+    {
+      url: baseUrl,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'weekly',
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/blog/receitas`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/blog/noticias`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/politica-privacidade`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/termos-uso`,
+      lastModified: new Date().toISOString(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+  ]
+
+  // URLs dinâmicas dos posts
   let posts: any[] = []
   try {
     posts = await getPublishedPosts()
+    console.log(`✅ ${posts.length} posts encontrados para o sitemap`)
   } catch (e) {
+    console.error('Erro ao buscar posts para sitemap:', e)
     posts = []
   }
 
-  const staticUrls: UrlEntry[] = [
-    { loc: baseUrl, changefreq: 'weekly', priority: 1.0 },
-    { loc: `${baseUrl}/blog`, changefreq: 'daily', priority: 0.8 },
-    { loc: `${baseUrl}/blog/receitas`, changefreq: 'weekly', priority: 0.7 },
-    { loc: `${baseUrl}/blog/noticias`, changefreq: 'weekly', priority: 0.7 },
-  ]
-
-  const dynamicUrls: UrlEntry[] = posts.map((post) => {
-    let loc = `${baseUrl}/blog/${post.slug}`
-    if (post.post_type === 'recipe') loc = `${baseUrl}/blog/receitas/${post.slug}`
-    if (post.post_type === 'news') loc = `${baseUrl}/blog/noticias/${post.slug}`
+  const dynamicUrls = posts.map((post) => {
+    let url = `${baseUrl}/blog/${post.slug}`
+    if (post.post_type === 'recipe') url = `${baseUrl}/blog/receitas/${post.slug}`
+    if (post.post_type === 'news') url = `${baseUrl}/blog/noticias/${post.slug}`
+    
     return {
-      loc,
-      lastmod: new Date(post.updated_at || post.created_at).toISOString(),
-      changefreq: 'monthly',
+      url,
+      lastModified: new Date(post.updated_at || post.created_at).toISOString(),
+      changeFrequency: 'monthly',
       priority: 0.6,
     }
   })
 
-  const urls: UrlEntry[] = [...staticUrls, ...dynamicUrls]
+  const allUrls = [...staticUrls, ...dynamicUrls]
+  console.log(`📄 Sitemap gerado com ${allUrls.length} URLs`)
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
-    .map(
-      (url) => `<url>\n  <loc>${url.loc}</loc>\n  ${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ''}\n  <changefreq>${url.changefreq}</changefreq>\n  <priority>${url.priority}</priority>\n</url>`
-    )
-    .join('\n')}\n</urlset>`
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allUrls
+  .map(
+    (url) => `  <url>
+    <loc>${url.url}</loc>
+    <lastmod>${url.lastModified}</lastmod>
+    <changefreq>${url.changeFrequency}</changefreq>
+    <priority>${url.priority}</priority>
+  </url>`
+  )
+  .join('\n')}
+</urlset>`
 
   return new NextResponse(xml, {
     headers: {
       'Content-Type': 'application/xml',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
     },
   })
 } 

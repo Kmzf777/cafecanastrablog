@@ -169,10 +169,8 @@ export default function RootLayout({
               <div className="mb-8 md:mb-0">
                 <h4 className="text-amber-500 font-semibold text-base mb-3 flex items-center gap-2">Links Úteis</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Política de Privacidade</a></li>
-                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Termos de Uso</a></li>
-                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Trocas e Devoluções</a></li>
-                  <li><a href="#" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Frete e Entrega</a></li>
+                  <li><a href="/politica-privacidade" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Política de Privacidade</a></li>
+                  <li><a href="/termos-uso" className="text-[#e5e7eb]/90 hover:text-white transition-colors">Termos de Uso</a></li>
                 </ul>
               </div>
               {/* Coluna 3: Newsletter + informações da empresa */}
