@@ -173,31 +173,124 @@ export function generateRecipeSchema(post: any) {
  * @param post O objeto do post
  */
 export function generateNewsArticleSchema(post: any) {
+  const url = `https://cafecanastra.com/blog/noticias/${post.slug}`
+  
+  // Extrair o corpo do artigo (primeiros parágrafos)
+  const articleBody = post.paragrafo_1 || post.secao_1_texto || post.resumo || ""
+  
+  // Determinar a categoria da notícia
+  const newsCategory = determineNewsCategory(post.titulo, post.resumo, post.meta_keywords)
+  
   return {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     "headline": post.titulo,
-    "image": post.imagem_titulo ? [post.imagem_titulo] : undefined,
+    "image": post.imagem_titulo ? [{
+      "@type": "ImageObject",
+      "url": post.imagem_titulo,
+      "width": 1200,
+      "height": 630,
+      "caption": post.alt_imagem_titulo || post.titulo
+    }] : undefined,
     "datePublished": post.created_at,
     "dateModified": post.updated_at || post.created_at,
     "author": {
       "@type": "Organization",
-      "name": "Café Canastra"
-    },
-    "publisher": {
-      "@type": "Organization",
       "name": "Café Canastra",
+      "url": "https://cafecanastra.com",
       "logo": {
         "@type": "ImageObject",
         "url": "https://cafecanastra.com/logo-canastra.png"
       }
     },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Café Canastra",
+      "url": "https://cafecanastra.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://cafecanastra.com/logo-canastra.png",
+        "width": 1200,
+        "height": 630
+      }
+    },
     "description": post.resumo || post.meta_description || "Notícia sobre café especial da Serra da Canastra.",
-    "articleBody": post.secao_1_texto || post.paragrafo_1 || undefined,
+    "articleBody": articleBody,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://cafecanastra.com/blog/noticias/${post.slug}`
+      "@id": url
     },
-    "inLanguage": "pt-BR"
+    "url": url,
+    "inLanguage": "pt-BR",
+    "isAccessibleForFree": true,
+    "articleSection": newsCategory,
+    "keywords": post.meta_keywords || "café especial, serra da canastra, café brasileiro, notícias café",
+    "about": [
+      { "@type": "Thing", "name": "Café Especial" },
+      { "@type": "Thing", "name": "Serra da Canastra" },
+      { "@type": "Thing", "name": "Café Brasileiro" },
+      { "@type": "Thing", "name": "Indústria do Café" }
+    ],
+    "mentions": [
+      { "@type": "Organization", "name": "Café Canastra", "url": "https://cafecanastra.com" }
+    ],
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Início",
+          "item": "https://cafecanastra.com/cafecanastra"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://cafecanastra.com/blog"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Notícias",
+          "item": "https://cafecanastra.com/blog/noticias"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": post.titulo,
+          "item": url
+        }
+      ]
+    }
   }
+}
+
+/**
+ * Determina a categoria da notícia baseada no título e conteúdo
+ */
+function determineNewsCategory(titulo: string, resumo?: string, keywords?: string): string {
+  const texto = `${titulo} ${resumo || ""} ${keywords || ""}`.toLowerCase()
+  
+  if (texto.includes("preço") || texto.includes("cotação") || texto.includes("mercado") || texto.includes("tarifa")) {
+    return "Mercado e Preços"
+  }
+  
+  if (texto.includes("colheita") || texto.includes("plantio") || texto.includes("produção") || texto.includes("safra")) {
+    return "Produção e Agricultura"
+  }
+  
+  if (texto.includes("evento") || texto.includes("feira") || texto.includes("exposição") || texto.includes("conferência")) {
+    return "Eventos e Feiras"
+  }
+  
+  if (texto.includes("qualidade") || texto.includes("degustação") || texto.includes("preparo") || texto.includes("receita")) {
+    return "Qualidade e Preparo"
+  }
+  
+  if (texto.includes("exportação") || texto.includes("importação") || texto.includes("comércio")) {
+    return "Comércio Internacional"
+  }
+  
+  return "Notícias Gerais"
 }

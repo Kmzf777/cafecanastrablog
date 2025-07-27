@@ -1,8 +1,9 @@
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemaps
 Sitemap: https://cafecanastra.com/sitemap.xml
+Sitemap: https://cafecanastra.com/sitemap-news.xml
 
 # Crawl-delay
 Crawl-delay: 1
