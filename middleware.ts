@@ -23,6 +23,7 @@ const PUBLIC_ROUTES = [
   '/blog',
   '/',
   '/sitemap.xml',
+  '/sitemap-news.xml',
   '/robots.txt',
   '/manifest.json'
 ]
@@ -75,6 +76,20 @@ async function verifyToken(token: string): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+  const userAgent = request.headers.get('user-agent') || ''
+
+  // Permitir acesso irrestrito aos sitemaps
+  if (pathname === '/sitemap.xml' || pathname === '/sitemap-news.xml' || pathname === '/robots.txt') {
+    return NextResponse.next();
+  }
+
+  // Permitir bots legítimos (Googlebot, Bingbot, etc)
+  const allowedBots = [
+    'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot', 'facebot', 'ia_archiver'
+  ]
+  if (allowedBots.some(bot => userAgent.toLowerCase().includes(bot))) {
+    return NextResponse.next();
+  }
   
   console.log(`[MIDDLEWARE] Acessando: ${pathname}`)
   
@@ -138,7 +153,6 @@ export async function middleware(request: NextRequest) {
   }
   
   // Bloquear bots maliciosos
-  const userAgent = request.headers.get('user-agent') || ''
   const maliciousBots = [
     'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 'python', 'php'
   ]
