@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import SkipLink from "@/components/skip-link"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -146,6 +147,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
+          <Analytics />
           {/* Footer global com 3 colunas: logo+desc+redes, links úteis, newsletter+empresa */}
           <footer className="bg-[#181c23] text-[#e5e7eb] py-12 px-4 text-sm mt-12 border-t border-[#23272f]">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6">
