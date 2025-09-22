@@ -350,7 +350,12 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
     console.log("=== BUSCANDO POSTS PUBLICADOS ===")
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabaseServer!.from("blog_posts")
+    if (!isSupabaseConfigured || !supabaseServer) {
+      console.log("❌ Supabase não configurado, retornando array vazio")
+      return []
+    }
+
+    const { data, error } = await supabaseServer.from("blog_posts")
       .select("*")
       .eq("status", "publicado")
       .order("created_at", { ascending: false })
@@ -375,7 +380,12 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     console.log("Slug:", slug)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabaseServer!.from("blog_posts")
+    if (!isSupabaseConfigured || !supabaseServer) {
+      console.log("❌ Supabase não configurado, retornando null")
+      return null
+    }
+
+    const { data, error } = await supabaseServer.from("blog_posts")
       .select("*")
       .eq("slug", slug)
       .eq("status", "publicado")
@@ -401,7 +411,12 @@ export async function getRecentPosts(limit = 4): Promise<BlogPost[]> {
     console.log("Limit:", limit)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabaseServer!.from("blog_posts")
+    if (!isSupabaseConfigured || !supabaseServer) {
+      console.log("❌ Supabase não configurado, retornando array vazio")
+      return []
+    }
+
+    const { data, error } = await supabaseServer.from("blog_posts")
       .select("id, titulo, slug, created_at")
       .eq("status", "publicado")
       .order("created_at", { ascending: false })
@@ -427,8 +442,13 @@ export async function getRecentPostsClient(limit = 4): Promise<BlogPost[]> {
     console.log("Limit:", limit)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("❌ Supabase não configurado, retornando array vazio")
+      return []
+    }
+
     // Buscar todos os campos relevantes para o cálculo correto do tempo de leitura
-    const { data, error } = await supabase!.from("blog_posts")
+    const { data, error } = await supabase.from("blog_posts")
       .select("*") // Buscar todos os campos
       .eq("status", "publicado")
       .order("created_at", { ascending: false })
@@ -454,7 +474,12 @@ export async function updateBlogPost(id: string, updates: Partial<BlogPost>): Pr
     console.log("ID:", id)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabase!.from("blog_posts")
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("❌ Supabase não configurado, não é possível atualizar post")
+      return null
+    }
+
+    const { data, error } = await supabase.from("blog_posts")
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq("id", id)
       .select()
@@ -480,7 +505,12 @@ export async function deleteBlogPost(id: string): Promise<boolean> {
     console.log("ID:", id)
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { error } = await supabase!.from("blog_posts").delete().eq("id", id)
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("❌ Supabase não configurado, não é possível deletar post")
+      return false
+    }
+
+    const { error } = await supabase.from("blog_posts").delete().eq("id", id)
 
     if (error) {
       console.error("❌ Erro ao deletar post:", error)
@@ -501,7 +531,12 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     console.log("=== BUSCANDO TODOS OS POSTS (ADMIN) ===")
     console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabase!.from("blog_posts").select("*").order("created_at", { ascending: false })
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("❌ Supabase não configurado, retornando array vazio")
+      return []
+    }
+
+    const { data, error } = await supabase.from("blog_posts").select("*").order("created_at", { ascending: false })
 
     if (error) {
       console.error("❌ Erro ao buscar todos os posts:", error)
@@ -523,7 +558,12 @@ export async function testSupabaseConnection(): Promise<boolean> {
     console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
     console.log("Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅ Definida" : "❌ Não definida")
 
-    const { data, error } = await supabase!.from("blog_posts").select("count", { count: "exact" }).limit(1)
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("❌ Supabase não configurado, conexão falhou")
+      return false
+    }
+
+    const { data, error } = await supabase.from("blog_posts").select("count", { count: "exact" }).limit(1)
 
     if (error) {
       console.error("❌ Erro na conexão:", error)
@@ -538,19 +578,25 @@ export async function testSupabaseConnection(): Promise<boolean> {
   }
 }
 
+
 // Função para upload de imagem no Supabase Storage
 export async function uploadImageToStorage(file: File, postId: string): Promise<string | null> {
   try {
+    if (!isSupabaseConfigured || !supabase) {
+      console.log("❌ Supabase não configurado, não é possível fazer upload")
+      return null
+    }
+
     const fileExt = file.name.split('.').pop()
     const filePath = `blog/${postId}/${Date.now()}.${fileExt}`
-    const { data, error } = await supabase!.storage
+    const { data, error } = await supabase.storage
       .from('blog-images') // nome do bucket
       .upload(filePath, file)
     if (error) {
       console.error('Erro ao fazer upload da imagem:', JSON.stringify(error, null, 2))
       return null
     }
-    const { data: publicUrlData } = supabase!.storage
+    const { data: publicUrlData } = supabase.storage
       .from('blog-images')
       .getPublicUrl(filePath)
     return publicUrlData?.publicUrl || null
