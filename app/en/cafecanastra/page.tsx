@@ -27,10 +27,8 @@ import {
   Coffee,
   HeartHandshake,
 } from "lucide-react"
-import BlogNotification from "@/components/blog-notification"
 import ProductCarousel from "@/components/product-carousel-en"
 import LanguageSwitcher from '@/components/LanguageSwitcher'
-import BlogSection from "@/components/blog-section"
 
 export default function CafeCanastraWebsite() {
   const [isMenuScrolled, setIsMenuScrolled] = useState(false)
@@ -319,7 +317,6 @@ export default function CafeCanastraWebsite() {
                 { name: "Coffees", id: "cafés" },
                 { name: "Kits", id: "kits" },
                 { name: "Testimonials", id: "depoimentos" },
-                { name: "Blog", id: "blog" },
                 { name: "Contact", id: "contato" }
               ].map((item) => (
                 <button
@@ -373,7 +370,6 @@ export default function CafeCanastraWebsite() {
                   { name: "Coffees", id: "cafés" },
                   { name: "Kits", id: "kits" },
                   { name: "Testimonials", id: "depoimentos" },
-                  { name: "Blog", id: "blog" },
                   { name: "Contact", id: "contato" }
                 ].map((item) => (
                   <button
@@ -572,6 +568,78 @@ export default function CafeCanastraWebsite() {
         </div>
       </section>
 
+      {/* Our Farm */}
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-amber-50">
+        <div className="w-full max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold mb-8 text-gray-800">
+              Our Farm
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left bg-white p-8 rounded-2xl shadow-md border border-amber-100">
+              <div className="space-y-4">
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Origin</span>
+                  <span className="text-gray-600">Serra da Canastra</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Municipality</span>
+                  <span className="text-gray-600">Medeiros-MG</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Species</span>
+                  <span className="text-gray-600">100% Arabica</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Altitude</span>
+                  <span className="text-gray-600">1250m</span>
+                </div>
+                 <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Average Temperature</span>
+                  <span className="text-gray-600">26ºC</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Latitude</span>
+                  <span className="text-gray-600">-19.890280</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Longitude</span>
+                  <span className="text-gray-600">-46.334943</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700">Entities</span>
+                  <span className="text-gray-600 text-right">EXPOOCACER, COOXUPÉ</span>
+                </div>
+                 <div className="flex flex-col border-b border-gray-100 pb-2">
+                  <span className="font-semibold text-gray-700 mb-1">Varieties</span>
+                  <span className="text-gray-600 text-sm">Arara Peaberry, Arara, Paraiso, Catuaí 2SL</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Location Map */}
+            <div className="mt-8 sm:mt-12 w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-md border border-amber-100">
+              <iframe
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                scrolling="no"
+                marginHeight={0}
+                marginWidth={0}
+                src="https://maps.google.com/maps?q=-19.890280,-46.334943&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                title="Farm Location"
+              ></iframe>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Sensory Gallery */}
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-white">
         <div className="w-full max-w-7xl mx-auto">
@@ -695,7 +763,6 @@ export default function CafeCanastraWebsite() {
       </section>
 
       {/* FAQ Section */}
-      <BlogSection />
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 bg-gray-50">
         <div className="w-full max-w-3xl mx-auto">
           <motion.div
@@ -845,7 +912,6 @@ export default function CafeCanastraWebsite() {
         </Button>
       </motion.div>
 
-      <BlogNotification />
     </div>
   )
 } 

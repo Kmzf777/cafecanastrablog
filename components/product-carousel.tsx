@@ -198,7 +198,7 @@ export default function ProductCarousel({ scrollToSection }: { scrollToSection?:
                     }}
                     onClick={scrollToSection ? () => scrollToSection('contato') : undefined}
                   >
-                    Comprar
+                    Comprar para meu negócio
                   </Button>
                 </div>
               </div>
