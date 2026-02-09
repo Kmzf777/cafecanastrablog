@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useState, useEffect, useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -29,6 +30,11 @@ import {
 } from "lucide-react"
 import ProductCarousel from "@/components/product-carousel-es"
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+
+const FarmMap = dynamic(() => import("@/components/FarmMap"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-amber-50 animate-pulse flex items-center justify-center text-amber-800">Cargando mapa...</div>
+})
 
 export default function CafeCanastraWebsite() {
   const [isMenuScrolled, setIsMenuScrolled] = useState(false)
@@ -624,17 +630,8 @@ export default function CafeCanastraWebsite() {
             </div>
 
             {/* Mapa de Ubicación */}
-            <div className="mt-8 sm:mt-12 w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-md border border-amber-100">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                scrolling="no"
-                marginHeight={0}
-                marginWidth={0}
-                src="https://maps.google.com/maps?q=-19.890280,-46.334943&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                title="Ubicación de la Finca"
-              ></iframe>
+            <div className="mt-8 sm:mt-12 w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-md border border-amber-100 relative z-0">
+              <FarmMap position={[-19.890280, -46.334943]} />
             </div>
           </motion.div>
         </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useState, useEffect, useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -16,7 +17,8 @@ import {
   Play,
   Calendar,
   Award,
-  Heart,
+  Sprout,
+  Globe,
   Plus,
   Minus,
   Instagram,
@@ -30,6 +32,11 @@ import {
 } from "lucide-react"
 import ProductCarousel from "@/components/product-carousel"
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+
+const FarmMap = dynamic(() => import("@/components/FarmMap"), { 
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-amber-50 animate-pulse flex items-center justify-center text-amber-800">Carregando mapa...</div>
+})
 
 export default function CafeCanastraWebsite() {
   const [isMenuScrolled, setIsMenuScrolled] = useState(false)
@@ -520,24 +527,18 @@ export default function CafeCanastraWebsite() {
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold mb-4 sm:mb-6 text-gray-800">
                 Nossa História
               </h2>
-              <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6 leading-relaxed">
-                Desde 1985, a família Canastra dedica-se ao cultivo artesanal de café especial na icônica Serra da
-                Canastra. Nossa paixão pela terra e pelo grão perfeito nos levou a criar uma das marcas mais respeitadas
-                do café brasileiro.
-              </p>
               <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 leading-relaxed">
-                Cada xícara conta uma história de tradição, inovação e amor pela arte de fazer café. Do plantio à sua
-                mesa, cuidamos de cada detalhe para entregar uma experiência única e inesquecível.
+                Tudo começou em 1985 com um sonho da família Boaventura no cerrado mineiro. De geração em geração, transformamos a paixão pelo cultivo em uma busca incansável pela excelência. Encontramos na Serra da Canastra o <i>terroir</i> perfeito para criar cafés que unem tradição e inovação. Hoje, levamos o sabor autêntico do Brasil direto da nossa fazenda para o mundo, conectando histórias e pessoas através de uma xícara inesquecível.
               </p>
 
               <div className="space-y-4">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+                    <Sprout className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">1985</h4>
-                    <p className="text-gray-600 text-sm sm:text-base">Fundação da fazenda familiar</p>
+                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">1985 - A Origem</h4>
+                    <p className="text-gray-600 text-sm sm:text-base">Sra. Conceição e Sr. Belchior iniciam o legado.</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -545,17 +546,26 @@ export default function CafeCanastraWebsite() {
                     <Award className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">2010</h4>
-                    <p className="text-gray-600 text-sm sm:text-base">Primeiro prêmio de qualidade</p>
+                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">1996 - Foco na Qualidade</h4>
+                    <p className="text-gray-600 text-sm sm:text-base">Nova era voltada para a excelência e exportação.</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+                    <Mountain className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">2020</h4>
-                    <p className="text-gray-600 text-sm sm:text-base">Lançamento da marca Canastra</p>
+                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">2008 - Serra da Canastra</h4>
+                    <p className="text-gray-600 text-sm sm:text-base">Descoberta do terroir perfeito em Minas Gerais.</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Coffee className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-sm sm:text-base">2016 - Café Canastra</h4>
+                    <p className="text-gray-600 text-sm sm:text-base">Nascimento da marca e venda direta ao consumidor.</p>
                   </div>
                 </div>
               </div>
@@ -620,17 +630,8 @@ export default function CafeCanastraWebsite() {
             </div>
             
             {/* Mapa de Localização */}
-            <div className="mt-8 sm:mt-12 w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-md border border-amber-100">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                scrolling="no"
-                marginHeight={0}
-                marginWidth={0}
-                src="https://maps.google.com/maps?q=-19.890280,-46.334943&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                title="Localização da Fazenda"
-              ></iframe>
+            <div className="mt-8 sm:mt-12 w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-md border border-amber-100 relative z-0">
+              <FarmMap position={[-19.890280, -46.334943]} />
             </div>
           </motion.div>
         </div>
