@@ -1,0 +1,75 @@
+# ========================================
+# CONFIGURAÇÃO DE CRON JOB PARA AGENDAMENTO AUTOMÁTICO
+# ========================================
+#
+# Este arquivo contém exemplos de como configurar um cron job
+# para executar o agendamento automático de posts entre 7h e 10h da manhã.
+#
+# Para usar, copie uma das linhas abaixo para o crontab:
+# crontab -e
+#
+# ========================================
+
+# EXEMPLO 1: Executar uma vez por hora entre 7h e 10h (7h, 8h, 9h)
+0 7-9 * * * /usr/bin/node /caminho/para/seu/projeto/scripts/scheduled-posts.js
+
+# EXEMPLO 2: Executar a cada 30 minutos entre 7h e 10h (7h, 7h30, 8h, 8h30, 9h, 9h30)
+0,30 7-9 * * * /usr/bin/node /caminho/para/seu/projeto/scripts/scheduled-posts.js
+
+# EXEMPLO 3: Executar a cada 15 minutos entre 7h e 10h
+0,15,30,45 7-9 * * * /usr/bin/node /caminho/para/seu/projeto/scripts/scheduled-posts.js
+
+# EXEMPLO 4: Executar apenas às 7h30 e 9h30
+30 7,9 * * * /usr/bin/node /caminho/para/seu/projeto/scripts/scheduled-posts.js
+
+# EXEMPLO 5: Executar com variáveis de ambiente personalizadas
+0 7-9 * * * cd /caminho/para/seu/projeto && POSTS_QUANTITY=2 POSTS_DELAY=2000 /usr/bin/node scripts/scheduled-posts.js
+
+# EXEMPLO 6: Executar com logging detalhado
+0 7-9 * * * cd /caminho/para/seu/projeto && VERBOSE=true /usr/bin/node scripts/scheduled-posts.js >> logs/scheduled-posts.log 2>&1
+
+# ========================================
+# VARIÁVEIS DE AMBIENTE DISPONÍVEIS
+# ========================================
+#
+# SCHEDULED_POSTS_API_URL - URL da API de agendamento
+# POSTS_QUANTITY - Quantidade de posts a criar (padrão: 1)
+# POSTS_DELAY - Atraso entre posts em ms (padrão: 1000)
+# POSTS_MODE - Modo de postagem (automático/personalizado)
+# POSTS_THEME - Tema para posts personalizados
+# POSTS_TARGET_AUDIENCE - Público-alvo para posts personalizados
+# MAX_RETRIES - Máximo de tentativas em caso de erro (padrão: 3)
+# RETRY_DELAY - Atraso entre tentativas em ms (padrão: 5000)
+# VERBOSE - Habilitar logging detalhado (true/false)
+#
+# ========================================
+# EXEMPLOS DE USO COM VARIÁVEIS
+# ========================================
+#
+# Criar 2 posts automáticos com 2 segundos de atraso:
+# POSTS_QUANTITY=2 POSTS_DELAY=2000 /usr/bin/node scripts/scheduled-posts.js
+#
+# Criar 1 post personalizado sobre café:
+# POSTS_MODE=personalizado POSTS_THEME="Café especial da Canastra" POSTS_TARGET_AUDIENCE="Apreciadores de café gourmet" /usr/bin/node scripts/scheduled-posts.js
+#
+# ========================================
+# LOGS E MONITORAMENTO
+# ========================================
+#
+# Para monitorar a execução, adicione redirecionamento de logs:
+# 0 7-9 * * * /usr/bin/node /caminho/para/seu/projeto/scripts/scheduled-posts.js >> /var/log/scheduled-posts.log 2>&1
+#
+# Para receber notificações por email em caso de erro:
+# 0 7-9 * * * /usr/bin/node /caminho/para/seu/projeto/scripts/scheduled-posts.js || echo "Erro no agendamento automático" | mail -s "Erro Agendamento" seu@email.com
+#
+# ========================================
+# TESTE MANUAL
+# ========================================
+#
+# Para testar manualmente (fora do horário permitido):
+# node scripts/scheduled-posts.js
+#
+# Para testar com configuração personalizada:
+# POSTS_QUANTITY=1 POSTS_DELAY=1000 VERBOSE=true node scripts/scheduled-posts.js
+#
+# ======================================== 

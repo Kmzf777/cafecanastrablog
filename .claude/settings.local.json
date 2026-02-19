@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(python3:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm --prefix \"C:/Users/rafae/OneDrive/Desktop/Canastra Inteligencia/Sites/cafe canastra blog/cafecanastrablog\" run lint)",
+      "Bash(powershell -Command \"Set-Location ''C:\\\\Users\\\\rafae\\\\OneDrive\\\\Desktop\\\\Canastra Inteligencia\\\\Sites\\\\cafe canastra blog\\\\cafecanastrablog''; npm run lint 2>&1\")",
+      "Bash(npx next lint:*)",
+      "Bash(node_modules/.bin/next --version)",
+      "Bash(node_modules/.bin/next lint:*)",
+      "Bash(ls:*)",
+      "Bash(npx next build)",
+      "Bash(node_modules/.bin/next build)",
+      "Bash(python:*)",
+      "Bash(node_modules/.bin/tsc:*)",
+      "Bash(npm --prefix \"C:\\\\Users\\\\rafae\\\\OneDrive\\\\Desktop\\\\Canastra Inteligencia\\\\Sites\\\\cafe canastra blog\\\\cafecanastrablog\" run lint)",
+      "Bash(node --version:*)",
+      "Bash(npm:*)",
+      "Bash(\"C:\\\\Users\\\\rafae\\\\OneDrive\\\\Desktop\\\\Canastra Inteligencia\\\\Sites\\\\cafe canastra blog\\\\cafecanastrablog\\\\node_modules\\\\.bin\\\\next\" --version)",
+      "Bash(cmd /c \"cd /d \"\"C:\\\\Users\\\\rafae\\\\OneDrive\\\\Desktop\\\\Canastra Inteligencia\\\\Sites\\\\cafe canastra blog\\\\cafecanastrablog\"\" && npm run build\")",
+      "Bash(./node_modules/.bin/next lint:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(node:*)",
+      "Bash(# Check if \"\"next\"\": \"\"^16.1.6\"\" is the real issue - find the actual installed version grep -r ''\"\"version\"\"'' \"\"/c/Users/rafae/OneDrive/Desktop/Canastra Inteligencia/Sites/cafe canastra blog/cafecanastrablog/node_modules/next/package.json\"\")",
+      "Bash(timeout 15 node_modules/.bin/next dev:*)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".claude/hooks/synapse-engine.js\""
+          }
+        ]
+      }
+    ]
+  }
+}
