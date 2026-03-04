@@ -25,7 +25,9 @@
       "Bash(git commit:*)",
       "Bash(node:*)",
       "Bash(# Check if \"\"next\"\": \"\"^16.1.6\"\" is the real issue - find the actual installed version grep -r ''\"\"version\"\"'' \"\"/c/Users/rafae/OneDrive/Desktop/Canastra Inteligencia/Sites/cafe canastra blog/cafecanastrablog/node_modules/next/package.json\"\")",
-      "Bash(timeout 15 node_modules/.bin/next dev:*)"
+      "Bash(timeout 15 node_modules/.bin/next dev:*)",
+      "Bash(npx eslint:*)",
+      "Bash(rm:*)"
     ]
   },
   "hooks": {

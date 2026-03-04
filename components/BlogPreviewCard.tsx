@@ -19,7 +19,7 @@ function truncateExcerpt(excerpt: string | null): string {
 }
 
 interface BlogPreviewCardProps {
-  post: Pick<BlogPost, 'id' | 'title' | 'slug' | 'excerpt' | 'image_url' | 'image_alt' | 'category' | 'published_at'>
+  post: Pick<BlogPost, 'id' | 'title' | 'slug' | 'excerpt' | 'image_url' | 'image_alt' | 'category' | 'published_at' | 'reading_time_minutes'>
 }
 
 export function BlogPreviewCard({ post }: BlogPreviewCardProps) {
@@ -53,9 +53,14 @@ export function BlogPreviewCard({ post }: BlogPreviewCardProps) {
           {excerpt && (
             <p className="text-gray-600 text-sm leading-relaxed">{excerpt}</p>
           )}
-          {date && (
-            <p className="text-gray-400 text-xs mt-2">{date}</p>
-          )}
+          <div className="flex items-center gap-3 mt-2">
+            {date && (
+              <p className="text-gray-400 text-xs">{date}</p>
+            )}
+            {post.reading_time_minutes && (
+              <span className="text-gray-400 text-xs">{post.reading_time_minutes} min</span>
+            )}
+          </div>
           <span className="text-amber-600 text-sm font-medium mt-3 inline-block">
             Ler mais →
           </span>
