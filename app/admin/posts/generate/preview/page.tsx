@@ -62,12 +62,20 @@ function PreviewContent() {
           return
         }
         if (!res.ok) {
-          setError('Post nao encontrado.')
+          const text = await res.text()
+          console.error(`[preview] API returned ${res.status}:`, text)
+          setError(`Erro ao carregar post (${res.status}). Verifique o console.`)
           return
         }
         const json = await res.json()
+        if (!json.post) {
+          console.error('[preview] API response missing post:', json)
+          setError('Resposta da API invalida.')
+          return
+        }
         setPost(json.post)
-      } catch {
+      } catch (err) {
+        console.error('[preview] Fetch error:', err)
         setError('Falha ao carregar o post.')
       } finally {
         setLoading(false)
@@ -155,7 +163,10 @@ function PreviewContent() {
   if (error || !post) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50">
-        <p className="text-red-500">{error || 'Post nao encontrado.'}</p>
+        <p className="text-red-500 max-w-md text-center">{error || 'Post nao encontrado.'}</p>
+        {postId && (
+          <p className="text-xs text-gray-400 font-mono">ID: {postId}</p>
+        )}
         <Button variant="outline" onClick={() => router.push('/admin/posts/generate')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar para geracao
