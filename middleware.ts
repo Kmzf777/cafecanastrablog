@@ -102,7 +102,7 @@ export async function middleware(request: NextRequest) {
   // CSP (Content Security Policy) - Adjusted to allow Supabase
   response.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-ancestors 'none';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://*.canastrainteligencia.com https://va.vercel-scripts.com; frame-ancestors 'none';"
   )
 
   // 6. Block malicious bots (basic check)

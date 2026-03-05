@@ -6,6 +6,8 @@ import { verifyAdminAuth, unauthorizedResponse } from '@/lib/admin-auth'
 const AI_API_URL = process.env.AI_API_URL
 const AI_API_SECRET = process.env.AI_API_SECRET
 
+export const maxDuration = 30
+
 export async function POST(request: NextRequest) {
   if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
 
@@ -26,6 +28,7 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${AI_API_SECRET}`,
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(25000),
     })
 
     const data = await res.json()

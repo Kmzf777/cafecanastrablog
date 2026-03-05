@@ -4,8 +4,11 @@
 import { NextRequest } from 'next/server'
 import { verifyAdminAuth, unauthorizedResponse } from '@/lib/admin-auth'
 
-const AI_API_URL = process.env.AI_API_URL // e.g. https://ai-api.cafecanastra.com
+const AI_API_URL = process.env.AI_API_URL // e.g. https://ai-api.canastrainteligencia.com
 const AI_API_SECRET = process.env.AI_API_SECRET
+
+// Allow up to 60s for AI generation (Gemini can be slow)
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
   if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
@@ -27,6 +30,7 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${AI_API_SECRET}`,
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(55000),
     })
 
     const data = await res.json()
