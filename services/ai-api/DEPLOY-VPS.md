@@ -45,7 +45,7 @@ Preciso que voce deixe online o backend de IA do projeto Cafe Canastra Blog.
 5. Adapte o `docker-compose.yml`:
    - Ajuste a rede externa para a mesma que o Traefik usa nesta VPS
    - Ajuste o certresolver para o mesmo nome usado pelos outros servicos
-   - Ajuste o Host rule para o subdominio desejado (ex: `ai-api.cafecanastra.com`)
+   - Ajuste o Host rule para o subdominio desejado (ex: `ai-api.canastrainteligencia.com`)
    - Se os outros servicos usam http (sem TLS), ajuste o entrypoint
 
 6. Suba o container:
@@ -61,7 +61,7 @@ Preciso que voce deixe online o backend de IA do projeto Cafe Canastra Blog.
 
 8. Teste o endpoint atraves do Traefik:
    ```bash
-   curl https://ai-api.cafecanastra.com/health
+   curl https://ai-api.canastrainteligencia.com/health
    ```
 
 ## Estrutura do servico
@@ -76,7 +76,7 @@ Autenticacao: Header `Authorization: Bearer {AI_API_SECRET}`
 ## Apos o deploy
 
 Anote o `AI_API_SECRET` gerado — ele precisa ser configurado tambem na Vercel:
-- `AI_API_URL=https://ai-api.cafecanastra.com` (ou o subdominio que voce escolher)
+- `AI_API_URL=https://ai-api.canastrainteligencia.com` (ou o subdominio que voce escolher)
 - `AI_API_SECRET=<mesmo-secret-do-.env-da-vps>`
 
 ## Portas e rede
