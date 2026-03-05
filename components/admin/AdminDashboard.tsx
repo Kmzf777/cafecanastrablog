@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Plus, Pencil, Globe, Copy, Trash2,
-  ArrowUpDown, ArrowUp, ArrowDown, Search,
+  ArrowUpDown, ArrowUp, ArrowDown, Search, Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -231,7 +231,13 @@ export default function AdminDashboard({ initialPosts }: AdminDashboardProps) {
                 Gerencie posts, agendamentos e conteúdo do Café Canastra.
               </p>
             </div>
-            <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+            <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none flex gap-2">
+              <Link href="/admin/posts/generate">
+                <Button variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Gerar com IA
+                </Button>
+              </Link>
               <Link href="/admin/posts/new">
                 <Button>
                   <Plus className="w-4 h-4 mr-2" />
