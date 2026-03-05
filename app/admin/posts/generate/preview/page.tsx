@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { Suspense, useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import {
   Loader2, ArrowLeft, Pencil, Check, Save, Trash2, Sparkles,
@@ -23,6 +23,18 @@ interface PostWithBlocks extends BlogPost {
 }
 
 export default function PreviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+      </div>
+    }>
+      <PreviewContent />
+    </Suspense>
+  )
+}
+
+function PreviewContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
