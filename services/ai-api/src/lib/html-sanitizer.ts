@@ -1,11 +1,13 @@
-import DOMPurify from 'isomorphic-dompurify'
+import sanitize from 'sanitize-html'
 
 const ALLOWED_TAGS = ['strong', 'em', 'u', 'a', 'mark', 'br', 'code']
-const ALLOWED_ATTR = ['href', 'target', 'rel']
+const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
+  a: ['href', 'target', 'rel'],
+}
 
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
+  return sanitize(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTRIBUTES,
   })
 }

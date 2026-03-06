@@ -33,12 +33,22 @@ export async function POST(request: NextRequest) {
       signal: AbortSignal.timeout(55000),
     })
 
-    const data = await res.json()
+    let data: unknown
+    const contentType = res.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
+      data = await res.json()
+    } else {
+      const text = await res.text()
+      console.error(`[ai/generate proxy] Non-JSON response (${res.status}):`, text.slice(0, 500))
+      data = { error: `VPS returned non-JSON response (${res.status})` }
+    }
+
     return Response.json(data, { status: res.status })
   } catch (error) {
     console.error('[ai/generate proxy] Error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
     return Response.json(
-      { error: 'Falha ao conectar com o servico de IA. Tente novamente.' },
+      { error: `Falha ao conectar com o servico de IA: ${message}` },
       { status: 502 }
     )
   }
