@@ -24,16 +24,22 @@ function generateExcerpt(content: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
+  try {
+    if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
 
-  const supabase = createServiceClient()
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .order('created_at', { ascending: false })
+    const supabase = createServiceClient()
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-  if (error) return Response.json({ error: error.message }, { status: 500 })
-  return Response.json({ posts: data })
+    if (error) return Response.json({ error: error.message }, { status: 500 })
+    return Response.json({ posts: data })
+  } catch (error) {
+    console.error('[GET /api/admin/posts] Error:', error)
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return Response.json({ error: message }, { status: 500 })
+  }
 }
 
 export async function POST(request: NextRequest) {

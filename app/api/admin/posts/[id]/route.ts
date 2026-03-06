@@ -12,39 +12,46 @@ import {
 import type { ContentBlock } from '@/lib/types/blog'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
+  try {
+    if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
 
-  const { id } = await params
-  const supabase = createServiceClient()
+    const { id } = await params
+    const supabase = createServiceClient()
 
-  // Fetch post
-  const { data: post, error } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('id', id)
-    .single()
+    // Fetch post
+    const { data: post, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-  if (error || !post) return Response.json({ error: 'Post not found' }, { status: 404 })
+    if (error || !post) return Response.json({ error: 'Post not found' }, { status: 404 })
 
-  // Fetch blocks ordered by order
-  const { data: blocks } = await supabase
-    .from('blog_post_blocks')
-    .select('*')
-    .eq('post_id', id)
-    .order('order', { ascending: true })
+    // Fetch blocks ordered by order
+    const { data: blocks } = await supabase
+      .from('blog_post_blocks')
+      .select('*')
+      .eq('post_id', id)
+      .order('order', { ascending: true })
 
-  return Response.json({ post: { ...post, blocks: blocks || [] } })
+    return Response.json({ post: { ...post, blocks: blocks || [] } })
+  } catch (error) {
+    console.error('[GET /api/admin/posts/[id]] Error:', error)
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return Response.json({ error: message }, { status: 500 })
+  }
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
+  try {
+    if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
 
-  const { id } = await params
-  const supabase = createServiceClient()
+    const { id } = await params
+    const supabase = createServiceClient()
 
-  // Check existence
-  const { data: existing } = await supabase.from('blog_posts').select('id').eq('id', id).single()
-  if (!existing) return Response.json({ error: 'Post not found' }, { status: 404 })
+    // Check existence
+    const { data: existing } = await supabase.from('blog_posts').select('id').eq('id', id).single()
+    if (!existing) return Response.json({ error: 'Post not found' }, { status: 404 })
 
   const body = await request.json()
   const {
@@ -184,15 +191,26 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     .order('order', { ascending: true })
 
   return Response.json({ post: { ...post, blocks: finalBlocks || [] } })
+  } catch (error) {
+    console.error('[PUT /api/admin/posts/[id]] Error:', error)
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return Response.json({ error: message }, { status: 500 })
+  }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
+  try {
+    if (!(await verifyAdminAuth(request))) return unauthorizedResponse()
 
-  const { id } = await params
-  const supabase = createServiceClient()
-  const { error } = await supabase.from('blog_posts').delete().eq('id', id)
+    const { id } = await params
+    const supabase = createServiceClient()
+    const { error } = await supabase.from('blog_posts').delete().eq('id', id)
 
-  if (error) return Response.json({ error: error.message }, { status: 500 })
-  return Response.json({ success: true })
+    if (error) return Response.json({ error: error.message }, { status: 500 })
+    return Response.json({ success: true })
+  } catch (error) {
+    console.error('[DELETE /api/admin/posts/[id]] Error:', error)
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return Response.json({ error: message }, { status: 500 })
+  }
 }
