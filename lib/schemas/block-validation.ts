@@ -86,7 +86,7 @@ export const faqDataSchema = z.object({
 export const ctaDataSchema = z.object({
   text: z.string().min(1),
   buttonText: z.string().min(1),
-  buttonUrl: z.string().url(),
+  buttonUrl: z.string().min(1),
   variant: z.enum(['primary', 'secondary', 'outline']).optional(),
   description: z.string().optional(),
 })

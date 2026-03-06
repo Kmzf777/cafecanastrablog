@@ -108,6 +108,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (hasBlocks) {
     const blockErrors = validateBlocks(validBlocks)
     if (blockErrors.length > 0) {
+      console.error('[PUT /api/admin/posts/[id]] Block validation errors:', blockErrors)
       return Response.json({ error: 'Block validation failed', details: blockErrors }, { status: 400 })
     }
   }
@@ -120,10 +121,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const seoResult = validateSeoConfig(cleanedSeoConfig)
-  if (!seoResult.valid) return Response.json({ error: seoResult.error }, { status: 400 })
+  if (!seoResult.valid) {
+    console.error('[PUT /api/admin/posts/[id]] SEO validation error:', seoResult.error)
+    return Response.json({ error: seoResult.error }, { status: 400 })
+  }
 
   const geoResult = validateGeoConfig(geo_config)
-  if (!geoResult.valid) return Response.json({ error: geoResult.error }, { status: 400 })
+  if (!geoResult.valid) {
+    console.error('[PUT /api/admin/posts/[id]] GEO validation error:', geoResult.error)
+    return Response.json({ error: geoResult.error }, { status: 400 })
+  }
 
   // Build update object
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }

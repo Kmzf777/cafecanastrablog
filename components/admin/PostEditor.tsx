@@ -203,6 +203,7 @@ export function PostEditor({
           description: `${actionLabel} com sucesso.`,
         })
 
+        router.refresh()
         router.push('/admin')
       } catch (err) {
         toast({

@@ -22,6 +22,7 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useToast } from '@/components/ui/use-toast'
 import type { BlogPost } from '@/lib/types/blog'
 
 type SortField = 'date' | 'title' | 'seo_score'
@@ -92,6 +93,7 @@ function getPostDate(post: BlogPost): string | null {
 
 export default function AdminDashboard({ initialPosts }: AdminDashboardProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [mounted, setMounted] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -200,7 +202,22 @@ export default function AdminDashboard({ initialPosts }: AdminDashboardProps) {
       const res = await fetch(`/api/admin/posts/${id}`, { method: 'DELETE' })
       if (res.ok) {
         setPosts(prev => prev.filter(p => p.id !== id))
+        toast({ title: 'Post excluído com sucesso.' })
+        router.refresh()
+      } else {
+        const json = await res.json().catch(() => ({}))
+        toast({
+          title: 'Erro ao excluir',
+          description: json.error || `Falha (${res.status})`,
+          variant: 'destructive',
+        })
       }
+    } catch (err) {
+      toast({
+        title: 'Erro ao excluir',
+        description: err instanceof Error ? err.message : 'Erro de conexão',
+        variant: 'destructive',
+      })
     } finally {
       setDeletingId(null)
     }
@@ -213,7 +230,21 @@ export default function AdminDashboard({ initialPosts }: AdminDashboardProps) {
       if (res.ok) {
         const { post } = await res.json()
         setPosts(prev => [post, ...prev])
+        toast({ title: 'Post duplicado com sucesso.' })
+      } else {
+        const json = await res.json().catch(() => ({}))
+        toast({
+          title: 'Erro ao duplicar',
+          description: json.error || `Falha (${res.status})`,
+          variant: 'destructive',
+        })
       }
+    } catch (err) {
+      toast({
+        title: 'Erro ao duplicar',
+        description: err instanceof Error ? err.message : 'Erro de conexão',
+        variant: 'destructive',
+      })
     } finally {
       setDuplicatingId(null)
     }
@@ -455,19 +486,15 @@ export default function AdminDashboard({ initialPosts }: AdminDashboardProps) {
 
                               {/* Delete */}
                               <AlertDialog>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <AlertDialogTrigger asChild>
-                                      <button
-                                        disabled={deletingId === post.id}
-                                        className="text-red-400 hover:text-red-600 p-1 disabled:opacity-50"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    </AlertDialogTrigger>
-                                  </TooltipTrigger>
-                                  <TooltipContent>Excluir</TooltipContent>
-                                </Tooltip>
+                                <AlertDialogTrigger asChild>
+                                  <button
+                                    disabled={deletingId === post.id}
+                                    className="text-red-400 hover:text-red-600 p-1 disabled:opacity-50"
+                                    title="Excluir"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>Excluir post</AlertDialogTitle>

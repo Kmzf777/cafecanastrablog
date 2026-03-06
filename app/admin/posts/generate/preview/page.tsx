@@ -88,28 +88,56 @@ function PreviewContent() {
     if (!post) return
     setPublishing(true)
     try {
+      // Send only the fields the PUT endpoint expects (not raw DB fields)
+      const payload = {
+        title: post.title,
+        slug: post.slug,
+        content: post.content || '',
+        excerpt: post.excerpt,
+        image_url: post.image_url,
+        image_alt: post.image_alt,
+        category: post.category,
+        tags: post.tags,
+        author: post.author,
+        locale: post.locale,
+        translation_group_id: post.translation_group_id,
+        seo_config: post.seo_config,
+        geo_config: post.geo_config,
+        seo_score: post.seo_score,
+        status: 'published',
+        published_at: new Date().toISOString(),
+        // Map DB block records to ContentBlock format (strip post_id, created_at)
+        blocks: post.blocks.map(b => ({
+          id: b.id,
+          type: b.type,
+          order: b.order,
+          data: b.data,
+          settings: b.settings,
+        })),
+      }
+
       const res = await fetch(`/api/admin/posts/${post.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...post,
-          status: 'published',
-          published_at: new Date().toISOString(),
-          blocks: post.blocks,
-        }),
+        body: JSON.stringify(payload),
       })
+
       if (!res.ok) {
-        throw new Error('Falha ao publicar')
+        const json = await res.json().catch(() => ({}))
+        const detail = json.details ? ` — ${JSON.stringify(json.details)}` : ''
+        throw new Error(json.error ? `${json.error}${detail}` : `Falha (${res.status})`)
       }
+
       toast({
         title: 'Post publicado!',
         description: `"${post.title}" foi publicado com sucesso.`,
       })
+      router.refresh()
       router.push('/admin')
-    } catch {
+    } catch (err) {
       toast({
         title: 'Erro ao publicar',
-        description: 'Nao foi possivel publicar o post. Ele permanece como rascunho.',
+        description: err instanceof Error ? err.message : 'Nao foi possivel publicar o post.',
         variant: 'destructive',
       })
       setPublishing(false)
@@ -130,17 +158,19 @@ function PreviewContent() {
     try {
       const res = await fetch(`/api/admin/posts/${post.id}`, { method: 'DELETE' })
       if (!res.ok) {
-        throw new Error('Falha ao excluir')
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error || `Falha (${res.status})`)
       }
       toast({
         title: 'Rascunho descartado',
         description: 'O post foi excluido.',
       })
+      router.refresh()
       router.push('/admin/posts/generate')
-    } catch {
+    } catch (err) {
       toast({
         title: 'Erro ao descartar',
-        description: 'Nao foi possivel excluir o post.',
+        description: err instanceof Error ? err.message : 'Nao foi possivel excluir o post.',
         variant: 'destructive',
       })
       setDeleting(false)
