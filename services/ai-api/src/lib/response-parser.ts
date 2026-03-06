@@ -58,6 +58,40 @@ function generateBlockId(): string {
   return crypto.randomUUID()
 }
 
+// Allowed CTA URLs — AI may invent URLs, so we map them to real pages
+const CTA_URL_MAP: Record<string, string> = {
+  loja: 'https://www.loja.cafecanastra.com',
+  compra: 'https://www.loja.cafecanastra.com',
+  produto: 'https://www.loja.cafecanastra.com',
+  shop: 'https://www.loja.cafecanastra.com',
+  store: 'https://www.loja.cafecanastra.com',
+  contato: 'https://cafecanastra.com/#contato',
+  contact: 'https://cafecanastra.com/#contato',
+  fale: 'https://cafecanastra.com/#contato',
+  whatsapp: 'https://cafecanastra.com/#contato',
+}
+const CTA_DEFAULT_URL = 'https://cafecanastra.com/'
+const CTA_ALLOWED_URLS = [
+  'https://cafecanastra.com/',
+  'https://cafecanastra.com/#contato',
+  'https://www.loja.cafecanastra.com',
+]
+
+function sanitizeCtaUrl(url: unknown): string {
+  if (typeof url !== 'string' || !url.trim()) return CTA_DEFAULT_URL
+
+  // Already an allowed URL
+  if (CTA_ALLOWED_URLS.some(allowed => url.startsWith(allowed))) return url
+
+  // Try to match by keyword in the URL
+  const lower = url.toLowerCase()
+  for (const [keyword, mappedUrl] of Object.entries(CTA_URL_MAP)) {
+    if (lower.includes(keyword)) return mappedUrl
+  }
+
+  return CTA_DEFAULT_URL
+}
+
 function sanitizeBlockData(type: string, data: Record<string, unknown>): Record<string, unknown> {
   const sanitized = { ...data }
 
@@ -72,6 +106,11 @@ function sanitizeBlockData(type: string, data: Record<string, unknown>): Record<
         answer: typeof item.answer === 'string' ? sanitizeHtml(item.answer) : item.answer,
       })
     )
+  }
+
+  // Sanitize CTA buttonUrl to only allowed URLs
+  if (type === 'cta') {
+    sanitized.buttonUrl = sanitizeCtaUrl(sanitized.buttonUrl)
   }
 
   return sanitized

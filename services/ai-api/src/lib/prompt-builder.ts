@@ -97,7 +97,11 @@ You may add additional paragraph, list, or quote blocks between these as needed.
 - paragraph: { "text": "string (can include <strong>, <em>, <a href> HTML)" }
 - callout: { "text": "string", "variant": "tip|info|warning", "title": "string" }
 - faq: { "items": [{ "question": "string", "answer": "string" }] } (3-5 items)
-- cta: { "text": "string", "buttonText": "string", "buttonUrl": "/contato", "variant": "primary" }
+- cta: { "text": "string", "buttonText": "string", "buttonUrl": "ALLOWED_URL", "variant": "primary" }
+  ALLOWED CTA URLs (use ONLY these — do NOT invent URLs):
+    - "https://cafecanastra.com/#contato" — for contact, questions, or "fale conosco"
+    - "https://www.loja.cafecanastra.com" — for products, store, or "compre agora"
+    - "https://cafecanastra.com/" — for brand story, "nossa historia", or general links
 - list: { "style": "ordered|unordered", "items": ["string"] }
 - quote: { "text": "string", "citation": "string" }
 `
@@ -140,5 +144,6 @@ IMPORTANT:
 - The excerpt must be compelling and include the focus keyword (120-160 chars)
 - Every block must have "type" and "data" fields
 - FAQ answers should be detailed (2-4 sentences each)
+- CTA buttonUrl MUST be one of: "https://cafecanastra.com/#contato", "https://www.loja.cafecanastra.com", or "https://cafecanastra.com/" — never use relative paths or invented URLs
 `
 }
