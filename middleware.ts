@@ -43,7 +43,8 @@ export async function middleware(request: NextRequest) {
 
   // 2. Allow legitimate bots
   const allowedBots = [
-    'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot', 'facebot', 'ia_archiver'
+    'googlebot', 'bingbot', 'slurp', 'duckduckbot', 'baiduspider', 'yandexbot',
+    'facebot', 'facebookexternalhit', 'facebookcatalog', 'ia_archiver'
   ]
   if (allowedBots.some(bot => userAgent.toLowerCase().includes(bot))) {
     return NextResponse.next();
