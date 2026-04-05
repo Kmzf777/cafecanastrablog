@@ -1,0 +1,87 @@
+<h2>Design da Página /anuga — Café Canastra</h2>
+<p class="subtitle">Visão geral das 3 telas do funil ANUGA</p>
+
+<div class="section">
+  <h3>Tela 1 — Animação de Entrada (3-4s)</h3>
+  <div class="mockup">
+    <div class="mockup-header">Fullscreen — Mobile First</div>
+    <div class="mockup-body" style="background: linear-gradient(135deg, #2C1810 0%, #4A2C1A 50%, #8B6914 100%); color: #F5E6D0; text-align: center; padding: 60px 24px; min-height: 400px; display: flex; flex-direction: column; justify-content: center; gap: 24px; font-family: Georgia, serif;">
+      <div style="font-size: 28px; font-weight: bold; letter-spacing: 0.5px;">Esse café aumenta a margem<br>do seu negócio.</div>
+      <div style="font-size: 18px; opacity: 0.8; font-style: italic;">Direto do produtor rural, na Serra da Canastra.</div>
+      <div style="font-size: 15px; opacity: 0.6; margin-top: 8px;">Mais qualidade. Mais consistência. Mais lucro por xícara.</div>
+      <div style="margin-top: 40px;">
+        <span style="background: rgba(245,230,208,0.15); border: 1px solid rgba(245,230,208,0.3); padding: 8px 20px; border-radius: 4px; font-size: 13px; letter-spacing: 1px;">PULAR →</span>
+      </div>
+    </div>
+  </div>
+  <p><strong>Animação:</strong> TextEffect char-by-char com blur preset. Fundo gradiente marrom escuro → dourado. Tipografia serifada. Cada frase aparece com delay sequencial (0s, 1.2s, 2.4s). Botão "pular" discreto.</p>
+</div>
+
+<div class="section">
+  <h3>Tela 2 — Página Principal (Valor + Formulário)</h3>
+  <div class="mockup">
+    <div class="mockup-header">Scroll — Mobile First</div>
+    <div class="mockup-body" style="background: #F5EDE4; color: #2C1810; padding: 0; font-family: -apple-system, sans-serif;">
+
+      <!-- Hero -->
+      <div style="background: linear-gradient(to bottom, #2C1810, #3D2215); color: #F5E6D0; padding: 40px 24px; text-align: center;">
+        <img src="" style="width: 80px; height: 80px; border-radius: 50%; background: rgba(245,230,208,0.2); margin: 0 auto 16px;" />
+        <div style="font-family: Georgia, serif; font-size: 24px; font-weight: bold; margin-bottom: 8px;">Ganhe 20% de bonificação<br>na sua primeira compra</div>
+        <div style="font-size: 14px; opacity: 0.7; border: 1px solid rgba(245,230,208,0.3); display: inline-block; padding: 4px 12px; border-radius: 12px;">🎯 Exclusivo visitantes ANUGA</div>
+      </div>
+
+      <!-- Value Block -->
+      <div style="padding: 32px 24px; border-bottom: 1px solid rgba(44,24,16,0.1);">
+        <div style="font-family: Georgia, serif; font-size: 18px; font-weight: bold; margin-bottom: 16px; color: #4A2C1A;">Por que esse café aumenta sua margem?</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <span style="color: #8B6914; font-size: 18px;">✦</span>
+            <span style="font-size: 14px;">Compra direta do produtor (sem intermediários)</span>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <span style="color: #8B6914; font-size: 18px;">✦</span>
+            <span style="font-size: 14px;">Padronização de qualidade</span>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <span style="color: #8B6914; font-size: 18px;">✦</span>
+            <span style="font-size: 14px;">Melhor custo-benefício por xícara</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div style="padding: 32px 24px;">
+        <div style="font-family: Georgia, serif; font-size: 16px; font-weight: bold; margin-bottom: 20px;">Receba seu cupom agora</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <input style="padding: 12px 16px; border: 1px solid #C4B5A3; border-radius: 8px; background: white; font-size: 14px;" placeholder="Nome" />
+          <input style="padding: 12px 16px; border: 1px solid #C4B5A3; border-radius: 8px; background: white; font-size: 14px;" placeholder="WhatsApp (DD) 99999-9999" />
+          <input style="padding: 12px 16px; border: 1px solid #C4B5A3; border-radius: 8px; background: white; font-size: 14px;" placeholder="E-mail" />
+          <select style="padding: 12px 16px; border: 1px solid #C4B5A3; border-radius: 8px; background: white; font-size: 14px; color: #888;">
+            <option>Você compra café para...</option>
+          </select>
+          <div style="background: #8B6914; color: white; padding: 14px; text-align: center; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer;">Quero receber meu benefício</div>
+        </div>
+        <div style="font-size: 12px; color: #888; margin-top: 12px; text-align: center;">Seu cupom será enviado por WhatsApp e e-mail.</div>
+      </div>
+    </div>
+  </div>
+  <p><strong>Design:</strong> Rústico-sofisticado. Fundo creme texturizado (#F5EDE4). Paleta terrosa: marrom (#2C1810), dourado (#8B6914), creme (#F5E6D0). Tipografia serifada nos títulos, sans-serif no corpo. Fotos da /public como decoração entre seções.</p>
+</div>
+
+<div class="section">
+  <h3>Tela 3 — Sucesso (Pós-Cadastro)</h3>
+  <div class="mockup">
+    <div class="mockup-header">Fullscreen — Tela de Sucesso</div>
+    <div class="mockup-body" style="background: linear-gradient(135deg, #2C1810 0%, #3D2215 100%); color: #F5E6D0; text-align: center; padding: 60px 24px; min-height: 350px; display: flex; flex-direction: column; justify-content: center; gap: 16px; font-family: Georgia, serif;">
+      <div style="font-size: 48px;">✓</div>
+      <div style="font-size: 24px; font-weight: bold;">Seu cupom de 20%<br>foi liberado!</div>
+      <div style="font-size: 14px; opacity: 0.7; font-family: sans-serif;">Enviamos no seu WhatsApp e e-mail.</div>
+      <div style="margin-top: 24px; border-top: 1px solid rgba(245,230,208,0.2); padding-top: 24px;">
+        <div style="font-size: 16px; margin-bottom: 8px;">Quer ajuda para escolher<br>seu café agora?</div>
+        <div style="font-size: 13px; opacity: 0.7; font-family: sans-serif; margin-bottom: 16px;">Fale com nosso consultor</div>
+        <div style="background: #25D366; color: white; padding: 14px 24px; border-radius: 8px; font-weight: bold; font-size: 15px; display: inline-block; font-family: sans-serif;">💬 Quero escolher meu café</div>
+      </div>
+    </div>
+  </div>
+  <p><strong>Ação:</strong> Botão verde WhatsApp abre wa.me/5534993195252 com mensagem pré-preenchida.</p>
+</div>

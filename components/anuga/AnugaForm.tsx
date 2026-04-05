@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface AnugaFormProps {
@@ -56,11 +57,11 @@ const LABELS: Record<string, { pt: string; en: string }> = {
   cafeteria: { pt: 'Cafeteria', en: 'Coffee Shop' },
   revenda: { pt: 'Revenda', en: 'Resale' },
   consumo_proprio: { pt: 'Consumo próprio', en: 'Personal Use' },
-  exportacao: { pt: 'Exportação 🌍', en: 'Export 🌍' },
+  exportacao: { pt: 'Exportação', en: 'Export' },
   submit: { pt: 'Quero receber meu benefício', en: 'I want my benefit' },
   aviso: {
-    pt: 'Seu cupom será enviado por WhatsApp e e-mail. Verifique se os dados estão corretos.',
-    en: 'Your coupon will be sent via WhatsApp and email. Please verify your info.',
+    pt: 'Seu cupom será enviado por WhatsApp e e-mail.',
+    en: 'Your coupon will be sent via WhatsApp and email.',
   },
 };
 
@@ -149,13 +150,13 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
   );
 
   const inputClass =
-    'w-full px-4 py-3 rounded-lg border bg-white text-[#2C1810] text-sm placeholder:text-[#2C1810]/40 focus:outline-none focus:ring-2 focus:ring-[#8B6914]/50 transition-colors';
+    'w-full px-4 py-3.5 rounded-xl border border-[#292524] bg-[#0C0A09] text-[#FAFAF9] text-sm placeholder:text-[#57534E] focus:outline-none focus:border-[#C8A96E]/50 focus:ring-1 focus:ring-[#C8A96E]/20 transition-all duration-200';
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* Nome */}
       <div>
-        <label className="block text-sm font-medium text-[#4A2C1A] mb-1">
+        <label className="block text-sm font-medium text-[#A8A29E] mb-2">
           {label('nome', isExport)}
         </label>
         <input
@@ -163,16 +164,16 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
           value={form.nome}
           onChange={(e) => handleChange('nome', e.target.value)}
           placeholder={isExport ? 'Your name' : 'Seu nome'}
-          className={cn(inputClass, errors.nome && 'border-red-400')}
+          className={cn(inputClass, errors.nome && 'border-red-500/50')}
         />
         {errors.nome && (
-          <p className="text-red-500 text-xs mt-1">{errors.nome}</p>
+          <p className="text-red-400 text-xs mt-1.5">{errors.nome}</p>
         )}
       </div>
 
       {/* WhatsApp */}
       <div>
-        <label className="block text-sm font-medium text-[#4A2C1A] mb-1">
+        <label className="block text-sm font-medium text-[#A8A29E] mb-2">
           {label('whatsapp', isExport)}
         </label>
         <input
@@ -180,16 +181,16 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
           value={form.whatsapp}
           onChange={(e) => handleChange('whatsapp', e.target.value)}
           placeholder="(DD) 99999-9999"
-          className={cn(inputClass, errors.whatsapp && 'border-red-400')}
+          className={cn(inputClass, errors.whatsapp && 'border-red-500/50')}
         />
         {errors.whatsapp && (
-          <p className="text-red-500 text-xs mt-1">{errors.whatsapp}</p>
+          <p className="text-red-400 text-xs mt-1.5">{errors.whatsapp}</p>
         )}
       </div>
 
       {/* Email */}
       <div>
-        <label className="block text-sm font-medium text-[#4A2C1A] mb-1">
+        <label className="block text-sm font-medium text-[#A8A29E] mb-2">
           {label('email', isExport)}
         </label>
         <input
@@ -197,16 +198,16 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
           value={form.email}
           onChange={(e) => handleChange('email', e.target.value)}
           placeholder={isExport ? 'your@email.com' : 'seu@email.com'}
-          className={cn(inputClass, errors.email && 'border-red-400')}
+          className={cn(inputClass, errors.email && 'border-red-500/50')}
         />
         {errors.email && (
-          <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          <p className="text-red-400 text-xs mt-1.5">{errors.email}</p>
         )}
       </div>
 
       {/* Segmento */}
       <div>
-        <label className="block text-sm font-medium text-[#4A2C1A] mb-1">
+        <label className="block text-sm font-medium text-[#A8A29E] mb-2">
           {label('segmento', isExport)}
         </label>
         <select
@@ -214,9 +215,13 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
           onChange={(e) => handleChange('segmento', e.target.value as Segmento)}
           className={cn(
             inputClass,
-            !form.segmento && 'text-[#2C1810]/40',
-            errors.segmento && 'border-red-400'
+            'appearance-none bg-[length:16px] bg-[position:right_16px_center] bg-no-repeat',
+            !form.segmento && 'text-[#57534E]',
+            errors.segmento && 'border-red-500/50'
           )}
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2378716C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+          }}
         >
           <option value="">{isExport ? 'Select...' : 'Selecione...'}</option>
           <option value="cafeteria">{label('cafeteria', isExport)}</option>
@@ -225,23 +230,26 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
           <option value="exportacao">{label('exportacao', isExport)}</option>
         </select>
         {errors.segmento && (
-          <p className="text-red-500 text-xs mt-1">{errors.segmento}</p>
+          <p className="text-red-400 text-xs mt-1.5">{errors.segmento}</p>
         )}
       </div>
 
       {/* Export message */}
       {isExport && (
-        <div className="bg-[#2C1810]/5 border border-[#8B6914]/30 rounded-lg p-4 text-sm text-[#4A2C1A]">
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="bg-[#C8A96E]/5 border border-[#C8A96E]/20 rounded-xl p-4 text-sm text-[#C8A96E]"
+        >
           <p className="font-medium">
-            🌍 We work with export-ready specialty coffees. Our team can assist
-            you internationally.
+            We work with export-ready specialty coffees. Our team can assist you internationally.
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* Submit error */}
       {submitError && (
-        <p className="text-red-500 text-sm text-center">{submitError}</p>
+        <p className="text-red-400 text-sm text-center">{submitError}</p>
       )}
 
       {/* Submit */}
@@ -249,19 +257,27 @@ export default function AnugaForm({ onSuccess }: AnugaFormProps) {
         type="submit"
         disabled={submitting}
         className={cn(
-          'w-full py-4 rounded-lg font-bold text-white text-base transition-all',
+          'w-full py-4 rounded-xl font-semibold text-sm tracking-wide transition-all duration-300',
           submitting
-            ? 'bg-[#8B6914]/50 cursor-not-allowed'
-            : 'bg-[#8B6914] hover:bg-[#7A5B10] active:scale-[0.98]'
+            ? 'bg-[#C8A96E]/30 text-[#C8A96E]/50 cursor-not-allowed'
+            : 'bg-[#C8A96E] text-[#0C0A09] hover:bg-[#D4B97A] active:scale-[0.98]'
         )}
       >
-        {submitting
-          ? 'Enviando...'
-          : label('submit', isExport)}
+        {submitting ? (
+          <span className="inline-flex items-center gap-2">
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Enviando...
+          </span>
+        ) : (
+          label('submit', isExport)
+        )}
       </button>
 
       {/* Helper text */}
-      <p className="text-xs text-[#2C1810]/50 text-center">
+      <p className="text-xs text-[#57534E] text-center">
         {label('aviso', isExport)}
       </p>
     </form>

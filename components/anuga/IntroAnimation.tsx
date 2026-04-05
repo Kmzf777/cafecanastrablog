@@ -1,73 +1,105 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { TextEffect } from '@/components/ui/text-effect';
+import { useState, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface IntroAnimationProps {
   onComplete: () => void;
 }
 
-export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
-  const [showLine2, setShowLine2] = useState(false);
-  const [showLine3, setShowLine3] = useState(false);
+const lines = [
+  'Esse café aumenta a margem do seu negócio.',
+  'Direto do produtor rural, na Serra da Canastra.',
+  'Mais qualidade. Mais consistência. Mais lucro por xícara.',
+];
 
-  const handleLine1Complete = useCallback(() => setShowLine2(true), []);
-  const handleLine2Complete = useCallback(() => setShowLine3(true), []);
-  const handleLine3Complete = useCallback(() => {
-    setTimeout(onComplete, 600);
-  }, [onComplete]);
+export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
+  const [currentLine, setCurrentLine] = useState(0);
+
+  useEffect(() => {
+    if (currentLine >= lines.length) {
+      const timer = setTimeout(onComplete, 400);
+      return () => clearTimeout(timer);
+    }
+
+    const timer = setTimeout(() => {
+      setCurrentLine((prev) => prev + 1);
+    }, 2800);
+
+    return () => clearTimeout(timer);
+  }, [currentLine, onComplete]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6"
-      style={{
-        background: 'linear-gradient(135deg, #2C1810 0%, #4A2C1A 50%, #8B6914 100%)',
-      }}
+      className="anuga-page fixed inset-0 z-50 flex flex-col items-center justify-center px-8"
+      style={{ background: '#0C0A09' }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-lg text-center space-y-6">
-        <TextEffect
-          per="char"
-          preset="blur"
-          as="h1"
-          className="text-2xl md:text-3xl font-bold text-[#F5E6D0] font-serif"
-          onAnimationComplete={handleLine1Complete}
-        >
-          Esse café aumenta a margem do seu negócio.
-        </TextEffect>
+      {/* Subtle grain overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+        }}
+      />
 
-        {showLine2 && (
-          <TextEffect
-            per="char"
-            preset="blur"
-            as="p"
-            className="text-lg md:text-xl text-[#F5E6D0]/80 italic font-serif"
-            onAnimationComplete={handleLine2Complete}
-          >
-            Direto do produtor rural, na Serra da Canastra.
-          </TextEffect>
-        )}
+      {/* Decorative gold line */}
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute top-0 left-0 right-0 h-[2px]"
+        style={{ background: 'linear-gradient(90deg, transparent, #C8A96E, transparent)' }}
+      />
 
-        {showLine3 && (
-          <TextEffect
-            per="char"
-            preset="blur"
-            as="p"
-            className="text-base md:text-lg text-[#F5E6D0]/60 font-serif"
-            onAnimationComplete={handleLine3Complete}
-          >
-            Mais qualidade. Mais consistência. Mais lucro por xícara.
-          </TextEffect>
-        )}
+      <div className="max-w-md md:max-w-xl w-full text-center relative z-10 min-h-[120px] flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          {currentLine < lines.length && (
+            <motion.p
+              key={currentLine}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{
+                enter: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+                exit: { duration: 0.4 },
+              }}
+              className={
+                currentLine === 0
+                  ? 'text-2xl md:text-4xl font-semibold text-[#FAFAF9] tracking-tight leading-snug'
+                  : currentLine === 1
+                    ? 'text-lg md:text-2xl text-[#C8A96E] font-light tracking-wide leading-relaxed'
+                    : 'text-base md:text-xl text-[#A8A29E] font-light leading-relaxed'
+              }
+            >
+              {lines[currentLine]}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Progress dots */}
+      <div className="absolute bottom-20 flex gap-2">
+        {lines.map((_, i) => (
+          <div
+            key={i}
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${
+              i === currentLine
+                ? 'bg-[#C8A96E] scale-100'
+                : i < currentLine
+                  ? 'bg-[#C8A96E]/30'
+                  : 'bg-[#292524]'
+            }`}
+          />
+        ))}
       </div>
 
       <button
         onClick={onComplete}
-        className="absolute bottom-8 right-8 text-[#F5E6D0]/40 hover:text-[#F5E6D0]/70 text-sm tracking-widest transition-colors"
+        className="absolute bottom-8 right-8 text-[#78716C] hover:text-[#C8A96E] text-xs tracking-[0.25em] uppercase transition-colors duration-300"
       >
-        PULAR →
+        Pular
       </button>
     </motion.div>
   );
