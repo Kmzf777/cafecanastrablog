@@ -2,24 +2,24 @@ import type { Metadata } from 'next';
 import AnugaClient from '@/components/anuga/AnugaClient';
 
 export const metadata: Metadata = {
-  title: 'Café Canastra | ANUGA 2026 — Oferta Exclusiva',
+  title: 'Café Canastra | ANUGA Select Brazil 2026',
   description:
-    'Ganhe 20% de bonificação na sua primeira compra. Café especial direto do produtor na Serra da Canastra.',
+    'Ganhe R$200 de desconto na primeira compra. Café especial direto do produtor na Serra da Canastra.',
   robots: {
     index: false,
     follow: false,
   },
   openGraph: {
-    title: 'Café Canastra | ANUGA 2026 — Oferta Exclusiva',
+    title: 'Café Canastra | ANUGA Select Brazil 2026',
     description:
-      'Ganhe 20% de bonificação. Café especial direto do produtor na Serra da Canastra.',
+      'Ganhe R$200 de desconto. Café especial direto do produtor na Serra da Canastra.',
     type: 'website',
     images: [
       {
         url: '/banner-cafecanastra.png',
         width: 1200,
         height: 630,
-        alt: 'Café Canastra — ANUGA 2026',
+        alt: 'Café Canastra — ANUGA Select Brazil 2026',
       },
     ],
   },

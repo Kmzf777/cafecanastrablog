@@ -1,18 +1,11 @@
 import type React from "react"
-import { Outfit, DM_Sans } from "next/font/google"
+import { Nunito_Sans } from "next/font/google"
 
-const outfit = Outfit({
+const nunito = Nunito_Sans({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-nunito",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-})
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 })
 
 export default function AnugaLayout({
@@ -21,20 +14,16 @@ export default function AnugaLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className={`${outfit.variable} ${dmSans.variable}`}>
+    <div className={nunito.variable}>
       <style>{`
         body > div > footer,
         body footer.bg-\\[\\#181c23\\] {
           display: none !important;
         }
-        .anuga-page * {
-          font-family: var(--font-dm-sans), system-ui, sans-serif;
-        }
-        .anuga-page h1,
-        .anuga-page h2,
-        .anuga-page h3,
-        .anuga-page h4 {
-          font-family: var(--font-outfit), system-ui, sans-serif;
+        .anuga-page,
+        .anuga-page *,
+        .anuga-display {
+          font-family: var(--font-nunito), system-ui, sans-serif;
         }
       `}</style>
       {children}
