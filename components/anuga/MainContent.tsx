@@ -142,7 +142,7 @@ export default function MainContent({ onFormSuccess }: MainContentProps) {
               alt="Café Canastra"
               width={56}
               height={56}
-              className="rounded-full ring-1 ring-white/10"
+              className="rounded-full ring-1 ring-white/10 brightness-0 invert"
             />
           </motion.div>
 
