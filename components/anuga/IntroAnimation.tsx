@@ -8,9 +8,9 @@ interface IntroAnimationProps {
 }
 
 const lines = [
-  { text: 'Esse café aumenta a margem do seu negócio.', style: 'text-3xl md:text-5xl font-extrabold text-[#FAFAF9] tracking-tight leading-snug' },
-  { text: 'Direto do produtor rural, na Serra da Canastra.', style: 'text-2xl md:text-4xl text-[#C8A96E] font-bold tracking-tight leading-snug' },
-  { text: 'Mais qualidade. Mais consistência. Mais lucro por xícara.', style: 'text-xl md:text-3xl text-[#E7E5E4] font-bold leading-snug' },
+  { text: 'Esse café aumenta a margem do seu negócio.', style: 'text-3xl md:text-5xl font-black text-[#1A1410] tracking-tight leading-snug' },
+  { text: 'Direto do produtor rural, na Serra da Canastra.', style: 'text-2xl md:text-4xl text-[#8B5A2B] font-black tracking-tight leading-snug' },
+  { text: 'Mais qualidade. Mais consistência. Mais lucro por xícara.', style: 'text-xl md:text-3xl text-[#4A3F33] font-bold leading-snug' },
 ];
 
 export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
@@ -40,7 +40,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
   return (
     <motion.div
       className="anuga-page fixed inset-0 z-50 flex flex-col items-center justify-center px-8 overflow-hidden"
-      style={{ background: '#0A0A0A' }}
+      style={{ background: '#FAF6EE' }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
@@ -57,14 +57,14 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 right-0 h-[1px] origin-left"
-        style={{ background: 'linear-gradient(90deg, transparent 0%, #C8A96E 40%, #C8A96E 60%, transparent 100%)' }}
+        className="absolute top-0 left-0 right-0 h-[2px] origin-left"
+        style={{ background: 'linear-gradient(90deg, transparent 0%, #8B5A2B 40%, #8B5A2B 60%, transparent 100%)' }}
       />
 
       {/* Ambient glow */}
       <motion.div
         className="absolute pointer-events-none"
-        animate={{ opacity: currentLine >= lines.length ? 0 : [0.03, 0.06, 0.03] }}
+        animate={{ opacity: currentLine >= lines.length ? 0 : [0.18, 0.28, 0.18] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           width: '600px',
@@ -100,7 +100,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
         initial={{ scaleX: 0 }}
         animate={{ scaleX: currentLine >= lines.length ? 0 : 1 }}
         transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 w-8 h-[1px] bg-[#C8A96E]/30"
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 w-12 h-[2px] bg-[#8B5A2B]"
       />
     </motion.div>
   );
