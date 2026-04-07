@@ -36,6 +36,11 @@ export async function middleware(request: NextRequest) {
   const ip = (request as any).ip || request.headers.get('x-forwarded-for') || 'unknown'
   const userAgent = request.headers.get('user-agent') || ''
 
+  // 0. Redirect /anuga (lowercase) to /ANUGA (case-sensitive)
+  if (pathname === '/anuga') {
+    return NextResponse.redirect(new URL('/ANUGA', request.url), 301)
+  }
+
   // 1. Allow unrestricted access to public files
   if (pathname === '/sitemap.xml' || pathname === '/sitemap-news.xml' || pathname === '/robots.txt') {
     return NextResponse.next();

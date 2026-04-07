@@ -41,15 +41,6 @@ const nextConfig = {
       ? { exclude: ['error', 'warn'] }
       : false,
   },
-  redirects: async () => {
-    return [
-      {
-        source: '/anuga',
-        destination: '/ANUGA',
-        permanent: true,
-      },
-    ]
-  },
   headers: async () => {
     return [
       {
