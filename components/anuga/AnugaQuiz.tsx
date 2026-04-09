@@ -23,12 +23,12 @@ interface FormErrors {
 
 /* ─── Segments ─── */
 const segments: { id: Segmento; label: string; labelEn: string; icon: string }[] = [
+  { id: 'cliente_final', label: 'Cliente Final / Consumo', labelEn: 'End Consumer', icon: '🏠' },
   { id: 'cafeteria', label: 'Cafeteria', labelEn: 'Coffee Shop', icon: '☕' },
   { id: 'revenda', label: 'Revenda / Distribuidora', labelEn: 'Resale / Distribution', icon: '📦' },
   { id: 'rede', label: 'Rede / Supermercado', labelEn: 'Retail / Supermarket', icon: '🏪' },
   { id: 'foodservice', label: 'Hotel / Restaurante', labelEn: 'Hotel / Restaurant', icon: '🍽️' },
   { id: 'exportacao', label: 'Exportação / Import / Importación', labelEn: 'Export · Import · Importación', icon: '🌍' },
-  { id: 'cliente_final', label: 'Cliente Final / Consumo', labelEn: 'End Consumer', icon: '🏠' },
 ];
 
 /* ─── Country codes ─── */
@@ -705,7 +705,7 @@ export default function AnugaQuiz() {
                     <div className="h-2 bg-[#8B5A2B]" />
 
                     {/* Coupon body */}
-                    <div className="px-6 py-7 text-center border-x-2 border-b-2 border-[#E5DDD0] rounded-b-2xl">
+                    <div className="relative z-10 px-6 py-7 text-center border-x-2 border-b-2 border-[#E5DDD0] rounded-b-2xl">
                       <p className="text-xs font-bold tracking-[0.3em] uppercase text-[#8B5A2B] mb-4">
                         Cupom de desconto · Café Canastra
                       </p>
@@ -714,7 +714,7 @@ export default function AnugaQuiz() {
                       <div className="border-t-2 border-dashed border-[#E5DDD0] mb-4" />
 
                       {/* Code */}
-                      <p className="text-[2.8rem] md:text-6xl font-black tracking-[0.12em] text-[#1A1410] leading-none mb-2 font-mono select-all">
+                      <p className="text-[clamp(1.4rem,5.5vw,3rem)] md:text-6xl font-black tracking-[0.04em] md:tracking-[0.08em] text-[#1A1410] leading-none mb-2 font-mono select-all whitespace-nowrap">
                         ESPECIAL10
                       </p>
 
