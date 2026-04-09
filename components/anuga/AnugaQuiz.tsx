@@ -144,10 +144,6 @@ export default function AnugaQuiz() {
 
   const handleSegmentSelect = useCallback((id: Segmento) => {
     setSegmento(id);
-    if (id === 'cliente_final') {
-      setTimeout(() => setStep('consumer'), 400);
-      return;
-    }
     // Default country: BR for non-export, US for export (user can change)
     setCountry(id === 'exportacao' ? COUNTRIES.find((c) => c.code === 'US')! : COUNTRIES[0]);
     setForm((prev) => ({ ...prev, whatsapp: '' }));
@@ -224,7 +220,7 @@ export default function AnugaQuiz() {
       );
 
       if (anySuccess) {
-        setStep(3);
+        setStep(segmento === 'cliente_final' ? 'consumer' : 3);
       } else {
         setSubmitError('Error sending · Erro ao enviar · Error al enviar');
       }
