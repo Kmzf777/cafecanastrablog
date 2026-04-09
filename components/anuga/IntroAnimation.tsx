@@ -20,8 +20,8 @@ const SCREENS = [
   { key: 'third',  text: 'Mais qualidade. Mais consistência. Mais lucro por xícara.', style: 'text-xl md:text-3xl text-[#4A3F33] font-bold leading-snug' },
 ];
 
-// ms por screen — 4 × ~440ms + transições ≈ 2s total
-const DURATIONS = [440, 460, 400, 380];
+// ms por screen — 4 × ~1s + transições ≈ 5s total
+const DURATIONS = [1050, 1250, 1150, 1000];
 
 export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
   const [screen, setScreen] = useState(0);
@@ -38,7 +38,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
   useEffect(() => {
     if (screen < SCREENS.length || done.current) return;
     done.current = true;
-    const timer = setTimeout(onComplete, 200);
+    const timer = setTimeout(onComplete, 280);
     return () => clearTimeout(timer);
   }, [screen, onComplete]);
 
@@ -93,7 +93,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.12, ease: EASE }}
+              transition={{ duration: 0.32, ease: EASE }}
               className="absolute text-center w-full"
             >
               <p className="text-lg md:text-xl font-bold tracking-[0.18em] uppercase text-[#4A3F33]">
@@ -112,7 +112,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.12, ease: EASE }}
+              transition={{ duration: 0.32, ease: EASE }}
               className="absolute text-center w-full"
             >
               <p className="text-3xl md:text-5xl font-black text-[#1A1410] tracking-tight leading-snug">
@@ -142,7 +142,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.12, ease: EASE }}
+              transition={{ duration: 0.32, ease: EASE }}
               className={`absolute text-center w-full ${SCREENS[screen].style}`}
             >
               {SCREENS[screen].text}

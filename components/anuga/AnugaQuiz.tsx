@@ -6,8 +6,8 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 /* ─── Types ─── */
-type Segmento = 'cafeteria' | 'revenda' | 'rede' | 'foodservice' | 'exportacao';
-type Step = 1 | 2 | 3;
+type Segmento = 'cafeteria' | 'revenda' | 'rede' | 'foodservice' | 'exportacao' | 'cliente_final';
+type Step = 1 | 2 | 3 | 'consumer';
 
 interface FormData {
   nome: string;
@@ -28,6 +28,7 @@ const segments: { id: Segmento; label: string; labelEn: string; icon: string }[]
   { id: 'rede', label: 'Rede / Supermercado', labelEn: 'Retail / Supermarket', icon: '🏪' },
   { id: 'foodservice', label: 'Hotel / Restaurante', labelEn: 'Hotel / Restaurant', icon: '🍽️' },
   { id: 'exportacao', label: 'Exportação / Import / Importación', labelEn: 'Export · Import · Importación', icon: '🌍' },
+  { id: 'cliente_final', label: 'Cliente Final / Consumo', labelEn: 'End Consumer', icon: '🏠' },
 ];
 
 /* ─── Country codes ─── */
@@ -137,15 +138,26 @@ export default function AnugaQuiz() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const isExport = segmento === 'exportacao';
 
   const handleSegmentSelect = useCallback((id: Segmento) => {
     setSegmento(id);
+    if (id === 'cliente_final') {
+      setTimeout(() => setStep('consumer'), 400);
+      return;
+    }
     // Default country: BR for non-export, US for export (user can change)
     setCountry(id === 'exportacao' ? COUNTRIES.find((c) => c.code === 'US')! : COUNTRIES[0]);
     setForm((prev) => ({ ...prev, whatsapp: '' }));
     setTimeout(() => setStep(2), 400);
+  }, []);
+
+  const handleCopyCode = useCallback(() => {
+    navigator.clipboard.writeText('ESPECIAL10').catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }, []);
 
   const handleChange = useCallback((field: keyof FormData, value: string) => {
@@ -223,6 +235,8 @@ export default function AnugaQuiz() {
     }
   }, [form, segmento]);
 
+  const numericStep = step === 'consumer' ? 2 : (step as number);
+
   const inputClass =
     'w-full px-5 py-5 md:px-6 md:py-6 rounded-2xl border-2 border-[#E5DDD0] bg-white text-[#1A1410] text-lg md:text-xl font-semibold placeholder:text-[#A89A86] placeholder:font-normal focus:outline-none focus:border-[#8B5A2B] focus:ring-4 focus:ring-[#8B5A2B]/15 transition-all duration-200';
 
@@ -273,7 +287,7 @@ export default function AnugaQuiz() {
                 <motion.div
                   className="h-full bg-[#8B5A2B] rounded-full"
                   initial={{ width: '0%' }}
-                  animate={{ width: step >= s ? '100%' : '0%' }}
+                  animate={{ width: numericStep >= s ? '100%' : '0%' }}
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 />
               </div>
@@ -628,6 +642,159 @@ export default function AnugaQuiz() {
                     </svg>
                     {isExport ? 'Talk to our team · Hablar con el equipo' : 'Falar com consultor'}
                   </a>
+                </motion.div>
+              </motion.div>
+            )}
+
+            {/* ═══ CONSUMER: DISCOUNT REVEAL ═══ */}
+            {step === 'consumer' && (
+              <motion.div
+                key="consumer"
+                variants={stepVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="flex-1 flex flex-col"
+              >
+                {/* Back */}
+                <button
+                  onClick={() => setStep(1)}
+                  className="text-base md:text-lg font-bold text-[#8B5A2B] hover:text-[#5C3A1A] transition-colors mb-8 inline-flex items-center gap-2 self-start"
+                >
+                  <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Voltar
+                </button>
+
+                {/* Coffee icon */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -15 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', damping: 10, stiffness: 200, delay: 0.05 }}
+                  className="text-5xl md:text-6xl mb-6 text-center"
+                >
+                  ☕
+                </motion.div>
+
+                {/* Headline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.15 }}
+                  className="text-center mb-8"
+                >
+                  <p className="text-sm md:text-base font-bold tracking-[0.25em] uppercase text-[#8B5A2B] mb-3">
+                    Presente especial para você
+                  </p>
+                  <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-[1.05] text-[#1A1410] mb-3">
+                    Você ganhou um<br />
+                    <span className="text-[#8B5A2B]">desconto exclusivo!</span>
+                  </h1>
+                  <p className="text-base md:text-lg text-[#4A3F33] font-semibold">
+                    Use o cupom abaixo na sua primeira compra na nossa loja online.
+                  </p>
+                </motion.div>
+
+                {/* Coupon card */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.88, y: 16 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.55, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="mx-auto w-full max-w-sm mb-6"
+                >
+                  <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+                    {/* Top accent stripe */}
+                    <div className="h-2 bg-[#8B5A2B]" />
+
+                    {/* Coupon body */}
+                    <div className="px-6 py-7 text-center border-x-2 border-b-2 border-[#E5DDD0] rounded-b-2xl">
+                      <p className="text-xs font-bold tracking-[0.3em] uppercase text-[#8B5A2B] mb-4">
+                        Cupom de desconto · Café Canastra
+                      </p>
+
+                      {/* Dashed separator */}
+                      <div className="border-t-2 border-dashed border-[#E5DDD0] mb-4" />
+
+                      {/* Code */}
+                      <p className="text-[2.8rem] md:text-6xl font-black tracking-[0.12em] text-[#1A1410] leading-none mb-2 font-mono select-all">
+                        ESPECIAL10
+                      </p>
+
+                      {/* Dashed separator */}
+                      <div className="border-t-2 border-dashed border-[#E5DDD0] mt-4 mb-4" />
+
+                      <p className="text-sm md:text-base text-[#4A3F33] font-semibold">
+                        10% de desconto em toda a loja
+                      </p>
+                      <p className="text-xs text-[#A89A86] font-medium mt-1">
+                        loja.cafecanastra.com
+                      </p>
+                    </div>
+
+                    {/* Side notches */}
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-[#FAF6EE] rounded-r-full border-r-2 border-[#E5DDD0]" />
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-[#FAF6EE] rounded-l-full border-l-2 border-[#E5DDD0]" />
+                  </div>
+                </motion.div>
+
+                {/* Copy button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="mb-4"
+                >
+                  <button
+                    onClick={handleCopyCode}
+                    className={`w-full py-4 md:py-5 rounded-2xl font-bold text-base md:text-lg tracking-wide transition-all duration-300 border-2 flex items-center justify-center gap-3 ${
+                      copied
+                        ? 'bg-green-50 border-green-400 text-green-700'
+                        : 'bg-white border-[#8B5A2B] text-[#8B5A2B] hover:bg-[#8B5A2B]/8 active:scale-[0.98]'
+                    }`}
+                  >
+                    {copied ? (
+                      <>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Cupom copiado!
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copiar código do cupom
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+
+                {/* CTA to store */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.6 }}
+                >
+                  <a
+                    href="https://loja.cafecanastra.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group w-full inline-flex items-center justify-center gap-3 bg-[#8B5A2B] hover:bg-[#5C3A1A] text-white font-black py-5 md:py-6 px-6 rounded-2xl text-lg md:text-xl tracking-wide transition-all duration-300 active:scale-[0.98] shadow-lg"
+                  >
+                    Ir para a loja
+                    <svg
+                      className="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-1"
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                  <p className="text-center text-xs text-[#A89A86] font-medium mt-3">
+                    loja.cafecanastra.com
+                  </p>
                 </motion.div>
               </motion.div>
             )}
