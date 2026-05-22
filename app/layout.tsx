@@ -89,6 +89,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Café Canastra" />
         <meta name="application-name" content="Café Canastra" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="facebook-domain-verification" content="ogohpq49tdth8zt1ms0zfm49dbtdli" />
         
         {/* Preconnect para melhorar performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
