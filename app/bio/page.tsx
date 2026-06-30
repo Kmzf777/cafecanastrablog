@@ -32,5 +32,5 @@ export const metadata: Metadata = {
 }
 
 export default function BioPage() {
-  return <BioClient />
+  return <BioClient year={new Date().getFullYear()} />
 }

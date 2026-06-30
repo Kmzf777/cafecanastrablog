@@ -163,7 +163,7 @@ function BioBackground({ reduce }: { reduce: boolean }) {
 /*  Motion variants                                                            */
 /* -------------------------------------------------------------------------- */
 
-function useVariants(reduce: boolean) {
+function buildVariants(reduce: boolean) {
   const container: Variants = {
     hidden: {},
     show: {
@@ -375,7 +375,7 @@ function BioSecondaryLinks({ item }: { item: Variants }) {
 /*  Footer                                                                      */
 /* -------------------------------------------------------------------------- */
 
-function BioFooter({ item }: { item: Variants }) {
+function BioFooter({ item, year }: { item: Variants; year: number }) {
   return (
     <motion.footer
       variants={item}
@@ -395,7 +395,7 @@ function BioFooter({ item }: { item: Variants }) {
         @cafecanastra
       </a>
       <p className="text-xs text-coffee-600">
-        © Café Canastra {new Date().getFullYear()}
+        © Café Canastra {year}
       </p>
     </motion.footer>
   )
@@ -405,10 +405,10 @@ function BioFooter({ item }: { item: Variants }) {
 /*  Page shell                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export default function BioClient() {
+export default function BioClient({ year }: { year: number }) {
   const prefersReduced = useReducedMotion()
   const reduce = !!prefersReduced
-  const { container, item } = useVariants(reduce)
+  const { container, item } = buildVariants(reduce)
 
   return (
     <main className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-10 text-coffee-900 antialiased sm:py-14">
@@ -432,7 +432,7 @@ export default function BioClient() {
 
         <BioSecondaryLinks item={item} />
 
-        <BioFooter item={item} />
+        <BioFooter item={item} year={year} />
       </motion.div>
     </main>
   )
