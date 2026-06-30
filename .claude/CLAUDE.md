@@ -2,6 +2,10 @@
 
 You are working with Synkra AIOS, an AI-Orchestrated System for Full Stack Development.
 
+## Idioma
+
+Responda SEMPRE em português brasileiro. Todas as explicações, mensagens e comunicações com o usuário devem ser em pt-BR. Termos técnicos e identificadores de código permanecem na forma original. Mantenha a ortografia correta, incluindo acentos e caracteres especiais.
+
 <!-- AIOS-MANAGED-START: core-framework -->
 ## Core Framework Understanding
 
