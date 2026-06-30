@@ -10,7 +10,6 @@ import {
   Globe,
   BookOpen,
   Landmark,
-  Instagram,
   ChevronRight,
   type LucideIcon,
 } from "lucide-react"
@@ -372,40 +371,10 @@ function BioSecondaryLinks({ item }: { item: Variants }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Footer                                                                      */
-/* -------------------------------------------------------------------------- */
-
-function BioFooter({ item, year }: { item: Variants; year: number }) {
-  return (
-    <motion.footer
-      variants={item}
-      className="flex flex-col items-center gap-2 pt-2 text-center"
-    >
-      <a
-        href="https://www.instagram.com/cafecanastra"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Instagram @cafecanastra (abre em nova aba)"
-        className="group inline-flex items-center gap-2 rounded-full border border-coffee-300/60 bg-coffee-50/70 px-4 py-1.5 text-sm font-medium text-coffee-800 backdrop-blur-sm transition-colors hover:border-gold-400 hover:text-coffee-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-coffee-100"
-      >
-        <Instagram
-          className="h-4 w-4 text-gold-600 transition-transform group-hover:scale-110"
-          aria-hidden="true"
-        />
-        @cafecanastra
-      </a>
-      <p className="text-xs text-coffee-600">
-        © Café Canastra {year}
-      </p>
-    </motion.footer>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
 /*  Page shell                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export default function BioClient({ year }: { year: number }) {
+export default function BioClient() {
   const prefersReduced = useReducedMotion()
   const reduce = !!prefersReduced
   const { container, item } = buildVariants(reduce)
@@ -431,8 +400,6 @@ export default function BioClient({ year }: { year: number }) {
         <BioDivider item={item} />
 
         <BioSecondaryLinks item={item} />
-
-        <BioFooter item={item} year={year} />
       </motion.div>
     </main>
   )
